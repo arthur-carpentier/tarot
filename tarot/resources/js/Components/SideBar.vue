@@ -4,10 +4,10 @@
       <Link href="/">
         <h2 class="text-2xl font-bold mb-6 text-center">Tarot</h2>
       </Link>
-      <div class="mb-6 p-4 bg-green-700 rounded-lg">
+      <div class="mb-6 bg-green-700 rounded-lg">
         <Link
           href="/new-game"
-          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+          class="flex items-center space-x-3 p-4 rounded-lg hover:bg-green-600 transition"
         >
           <PlayIcon class="w-6 h-6" />
           <span>Nouvelle partie</span>
