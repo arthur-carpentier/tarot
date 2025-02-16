@@ -19,6 +19,7 @@ import "@fontsource/poppins/600-italic.css";
 import "@fontsource/poppins/700-italic.css";
 import "@fontsource/poppins/800-italic.css";
 import "@fontsource/poppins/900-italic.css";
+import '@fortawesome/fontawesome-free/css/all.css';
 
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';

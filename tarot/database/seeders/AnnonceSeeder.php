@@ -16,12 +16,12 @@ class AnnonceSeeder extends Seeder
         Annonce::create([
             'name' => 'Petite',
             'multiplicateur' => 1,
-            'color' => '#40f4fb',
+            'color' => '#c9d32e',
         ]);
         Annonce::create([
             'name' => 'Garde',
             'multiplicateur' => 2,
-            'color' => '#02f69a',
+            'color' => '#18d28c',
         ]);
         Annonce::create([
             'name' => 'Garde Sans',

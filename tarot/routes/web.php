@@ -10,8 +10,14 @@ Route::get('/', function () {
 Route::get('/manage-players', function () {
     return Inertia::render('ManagePlayers');
 });
+Route::get('/manage-rules', function () {
+    return Inertia::render('ManageRules');
+});
 Route::get('/new-game', function () {
     return Inertia::render('NewGame');
+});
+Route::get('/games', function () {
+    return Inertia::render('Games');
 });
 
 Route::middleware([

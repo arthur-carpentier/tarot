@@ -261,7 +261,7 @@ onMounted(async () => {
 const fetchPlayers = async () => {
   loading.value = true;
   try {
-    const response = await fetch("/api/list-players");
+    const response = await fetch("/api/players");
     players.value = response.status === 204 ? [] : await response.json();
   } catch (error) {
     console.error("Erreur de récupération des joueurs :", error);

@@ -18,9 +18,10 @@ return new class extends Migration {
         Schema::create('games', function (Blueprint $table) {
             $table->id();
             $table->foreignId('annonce_id')->nullable()->constrained()->onDelete('set null');
-            $table->integer('nb_bouts')->check('nb_bouts >= 0 AND nb_bouts <= 3');
-            $table->float('nb_points');
+            $table->integer('nb_bouts')->check('nb_bouts >= 0 AND nb_bouts <= 3')->nullable();
+            $table->float('nb_points')->check('nb_points >= 0 AND nb_points <= 91')->nullable();
             $table->boolean('enculette');
+            $table->boolean('pointsForAttaque')->nullable();
             $table->timestamps();
         });
 

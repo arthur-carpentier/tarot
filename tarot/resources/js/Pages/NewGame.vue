@@ -16,7 +16,7 @@
               <div class="flex items-center justify-between">
                 <div
                   @click="enculette = !enculette"
-                  class="relative w-14 h-8 bg-gray-500 rounded-full transition-all duration-300 flex items-center"
+                  class="relative w-14 h-8 bg-gray-500 rounded-full transition-all duration-300 flex items-center cursor-pointer"
                   :class="enculette ? 'bg-green-500' : 'bg-gray-500'"
                 >
                   <span
@@ -41,7 +41,9 @@
                 <div
                   v-for="annonce in annonces"
                   :key="annonce.id"
-                  @click="selectedAnnonce = annonce.id"
+                  @click="
+                    selectedAnnonce = selectedAnnonce == annonce.id ? null : annonce.id
+                  "
                   class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200"
                   :class="{
                     'opacity-50 grayscale scale-95':
@@ -152,7 +154,9 @@
 
             <div class="bg-gray-700 p-4 rounded-lg">
               <h2 class="text-xl font-semibold mb-4">Défense</h2>
-              <label class="block text-sm font-medium mb-2">Sélectionner 3-4 Joueurs</label>
+              <label class="block text-sm font-medium mb-2"
+                >Sélectionner 3-4 Joueurs</label
+              >
               <template v-if="loadingPlayers">
                 <div
                   v-for="n in 4"
@@ -257,7 +261,7 @@
             <label class="block text-2xl font-semibold">Pour qui ?</label>
             <div class="grid grid-cols-2 gap-4 mt-2">
               <div
-                @click="pointsFor = 'attaque'"
+                @click="pointsFor = pointsFor == 'attaque' ? null : 'attaque'"
                 class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200 hover:brightness-110 hover:saturate-125"
                 :style="{ backgroundColor: '#dc2626' }"
                 :class="{
@@ -270,7 +274,7 @@
                 Attaque
               </div>
               <div
-                @click="pointsFor = 'defense'"
+                @click="pointsFor = pointsFor == 'defense' ? null : 'defense'"
                 class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200 hover:brightness-110 hover:saturate-125"
                 :style="{ backgroundColor: '#2563eb' }"
                 :class="{
@@ -288,53 +292,179 @@
           <div class="bg-gray-700 p-4 rounded-lg" v-if="!enculette">
             <label class="block text-2xl font-semibold">Bonus</label>
             <div class="grid gap-4 mt-2">
-              <div class="grid grid-cols-3 gap-4">
-                <div
-                  v-for="bonus in bonuses.slice(0, 3)"
-                  :key="bonus.id"
-                  @click="toggleBonus(bonus.id)"
-                  class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200"
-                  :class="{
-                    'opacity-50 grayscale scale-95': !selectedBonuses.includes(bonus.id),
-                    'brightness-125 saturate-125': selectedBonuses.includes(bonus.id),
-                    'hover:brightness-110 hover:saturate-125': !selectedBonuses.includes(
-                      bonus.id
-                    ),
-                  }"
-                  :style="{ backgroundColor: '#007700' }"
-                >
-                  {{ bonus.name }}
+              <template v-if="loadingBonuses">
+                <div class="grid grid-cols-3 gap-4">
+                  <div
+                    v-for="n in 3"
+                    :key="n"
+                    class="h-16 bg-gray-600 rounded-lg animate-pulse scale-95"
+                  ></div>
                 </div>
-              </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div
+                    v-for="n in 2"
+                    :key="n"
+                    class="h-16 bg-gray-600 rounded-lg animate-pulse scale-95"
+                  ></div>
+                </div>
+              </template>
+              <template v-else>
+                <div class="grid grid-cols-3 gap-4">
+                  <div
+                    v-for="bonus in bonuses.slice(0, 3)"
+                    :key="bonus.id"
+                    @click="toggleBonus(bonus.id)"
+                    class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200"
+                    :class="{
+                      'opacity-50 grayscale scale-95': !selectedBonuses.includes(
+                        bonus.id
+                      ),
+                      'brightness-125 saturate-125': selectedBonuses.includes(bonus.id),
+                      'hover:brightness-110 hover:saturate-125': !selectedBonuses.includes(
+                        bonus.id
+                      ),
+                    }"
+                    :style="{ backgroundColor: '#007700' }"
+                  >
+                    {{ bonus.name }}
+                  </div>
+                </div>
 
-              <div class="grid grid-cols-2 gap-4">
-                <div
-                  v-for="bonus in bonuses.slice(3, 5)"
-                  :key="bonus.id"
-                  @click="toggleBonus(bonus.id)"
-                  class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200"
-                  :class="{
-                    'opacity-50 grayscale scale-95': !selectedBonuses.includes(bonus.id),
-                    'brightness-125 saturate-125': selectedBonuses.includes(bonus.id),
-                    'hover:brightness-110 hover:saturate-125': !selectedBonuses.includes(
-                      bonus.id
-                    ),
-                  }"
-                  :style="{ backgroundColor: '#007700' }"
-                >
-                  {{ bonus.name }}
+                <div class="grid grid-cols-3 gap-4">
+                  <div
+                    v-for="bonus in bonuses.slice(3, 6)"
+                    :key="bonus.id"
+                    @click="toggleBonus(bonus.id)"
+                    class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200"
+                    :class="{
+                      'opacity-50 grayscale scale-95': !selectedBonuses.includes(
+                        bonus.id
+                      ),
+                      'brightness-125 saturate-125': selectedBonuses.includes(bonus.id),
+                      'hover:brightness-110 hover:saturate-125': !selectedBonuses.includes(
+                        bonus.id
+                      ),
+                    }"
+                    :style="{ backgroundColor: '#007700' }"
+                  >
+                    {{ bonus.name }}
+                  </div>
                 </div>
-              </div>
+              </template>
             </div>
           </div>
 
           <button
             type="submit"
             class="bg-blue-600 text-white px-4 py-2 rounded w-full text-2xl font-semibold"
+            :class="{
+              'bg-gray-500 cursor-not-allowed': isDisabled,
+            }"
+            :disabled="isDisabled"
           >
             Ajouter
           </button>
         </form>
+      </div>
+      <div
+        class="bg-gray-800 p-6 rounded-lg shadow-lg mx-auto max-w-[35vw] mt-4"
+        v-if="preneur && defense.length > 0"
+      >
+        <div class="bg-gray-700 p-4 px-12 rounded-lg">
+          <div class="block text-2xl font-semibold justify-self-center">
+            <span>Prévisualisation des points</span>
+          </div>
+          <div class="mt-2 p-3 max-w-96 mx-auto">
+            <!-- Preneur -->
+            <div v-if="preneurPlayer" class="grid grid-cols-2">
+              <div class="relative flex space-x-4">
+                <img
+                  :src="
+                    preneurPlayer.photo
+                      ? `/storage/${preneurPlayer.photo}`
+                      : '/images/default-avatar.png'
+                  "
+                  class="w-12 h-12 rounded-full shadow-md transition-all duration-100 outline outline-4 outline-red-500 opacity-100"
+                />
+                <span class="transition-all duration-200 my-auto">
+                  {{ preneurPlayer.name }}
+                </span>
+              </div>
+              <span
+                class="my-auto"
+                :class="{
+                  'text-green-400': pointsAmount > 0,
+                  'text-red-400': pointsAmount < 0,
+                }"
+                >{{
+                  (pointsAmount > 0 ? "+" : "") +
+                  (pointsAmount * (roiPlayer ? 2 / 3 : 1)).toFixed(1) +
+                  "pts"
+                }}</span
+              >
+            </div>
+
+            <!-- Roi -->
+            <div v-if="roiPlayer" class="grid grid-cols-2 mt-4">
+              <div class="relative flex space-x-4">
+                <img
+                  :src="
+                    roiPlayer.photo
+                      ? `/storage/${roiPlayer.photo}`
+                      : '/images/default-avatar.png'
+                  "
+                  class="w-12 h-12 rounded-full shadow-md transition-all duration-100 outline outline-4 outline-yellow-500 opacity-100"
+                />
+                <span class="transition-all duration-200 my-auto">
+                  {{ roiPlayer.name }}
+                </span>
+              </div>
+              <span
+                class="my-auto"
+                :class="{
+                  'text-green-400': pointsAmount > 0,
+                  'text-red-400': pointsAmount < 0,
+                }"
+                >{{
+                  (pointsAmount > 0 ? "+" : "") + (pointsAmount / 3).toFixed(1) + "pts"
+                }}</span
+              >
+            </div>
+
+            <!-- Défense -->
+            <div
+              v-for="defender in defensePlayers"
+              :key="defender.id"
+              class="grid grid-cols-2 mt-4"
+            >
+              <div class="relative flex space-x-4">
+                <img
+                  :src="
+                    defender.photo
+                      ? `/storage/${defender.photo}`
+                      : '/images/default-avatar.png'
+                  "
+                  class="w-12 h-12 rounded-full shadow-md transition-all duration-100 outline outline-4 outline-blue-500 opacity-100"
+                />
+                <span class="transition-all duration-200 my-auto">
+                  {{ defender.name }}
+                </span>
+              </div>
+              <span
+                class="my-auto"
+                :class="{
+                  'text-green-400': pointsAmount < 0,
+                  'text-red-400': pointsAmount > 0,
+                }"
+                >{{
+                  (pointsAmount < 0 ? "+" : "") +
+                  ((-1 * pointsAmount) / defense.length).toFixed(1) +
+                  "pts"
+                }}</span
+              >
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -371,15 +501,32 @@
   position: relative;
   z-index: 2;
 }
+
+.animate-pulse {
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
 </style>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import Sidebar from "@/Components/SideBar.vue";
 import axios from "axios";
 
 const annonces = ref([]);
+const bonuses = ref([]);
 const players = ref([]);
 const loadingAnnonces = ref(true);
+const loadingBonuses = ref(true);
 const loadingPlayers = ref(true);
 const selectedAnnonce = ref(null);
 const preneur = ref(null);
@@ -404,34 +551,6 @@ const bouts = [
     name: "Excuse",
   },
 ];
-const bonuses = [
-  {
-    id: 1,
-    name: "Poignée",
-    points: 20,
-  },
-  {
-    id: 2,
-    name: "Double-Poignée",
-    points: 30,
-  },
-  {
-    id: 3,
-    name: "Triple-Poignée",
-    points: 40,
-  },
-  {
-    id: 4,
-    name: "Misère d'atout",
-    points: 20,
-  },
-  {
-    id: 5,
-    name: "Misère de tête",
-    points: 20,
-  },
-];
-
 onMounted(async () => {
   try {
     const { data: annonceData } = await axios.get("/api/annonces");
@@ -441,9 +560,17 @@ onMounted(async () => {
   } finally {
     loadingAnnonces.value = false;
   }
+  try {
+    const { data: bonusData } = await axios.get("/api/bonuses");
+    bonuses.value = bonusData;
+  } catch (error) {
+    console.error("Error fetching bonuses", error);
+  } finally {
+    loadingBonuses.value = false;
+  }
 
   try {
-    const { data: playerData } = await axios.get("/api/list-players");
+    const { data: playerData } = await axios.get("/api/players");
     players.value = playerData;
   } catch (error) {
     console.error("Error fetching players", error);
@@ -561,6 +688,56 @@ const getColor = (value) => {
   }
 };
 
+const isDisabled = computed(() => {
+  return (
+    !defense.value.length ||
+    !preneur.value ||
+    ((!selectedAnnonce.value || !pointsFor.value) && !enculette.value)
+  );
+});
+
+const pointsAmount = computed(() => {
+  const basePoints = 25;
+
+  const boutsValue =
+    pointsFor.value == "attaque"
+      ? selectedBouts.value?.length
+      : 3 - selectedBouts.value?.length;
+  const pointsValue = pointsFor.value == "attaque" ? points.value : 91 - points.value;
+
+  const pointsObjectiveArray = {
+    0: 56,
+    1: 51,
+    2: 41,
+    3: 36,
+  };
+
+  const pointsObjective = pointsObjectiveArray[boutsValue] || 56;
+  const pointsOffset = pointsValue - pointsObjective;
+  const sign = Math.sign(pointsOffset);
+  const pointsOffsetAbsoluteValue = Math.abs(pointsOffset);
+  const selectedBonusesPoints = bonuses.value
+    .filter((bonus) => selectedBonuses.value.includes(bonus.id))
+    .reduce((sum, bonus) => sum + bonus.points, 0);
+
+  const selectedAnnonceMultiplier =
+    annonces.value.find((a) => a.id === selectedAnnonce.value)?.multiplicateur || 1;
+  if (enculette.value === true) {
+    return -1 * (basePoints + 10) * 2;
+  }
+  return (
+    (sign == 0 ? 1 : sign) *
+    (basePoints + pointsOffsetAbsoluteValue + selectedBonusesPoints) *
+    selectedAnnonceMultiplier
+  );
+});
+
+const preneurPlayer = computed(() => players.value.find((p) => p.id === preneur.value));
+const roiPlayer = computed(() => players.value.find((p) => p.id === roi.value));
+const defensePlayers = computed(() =>
+  players.value.filter((p) => defense.value.includes(p.id))
+);
+
 const submitGame = async () => {
   console.log("issou");
   if (defense.value.length < 3 || defense.value.length > 4) {
@@ -576,26 +753,11 @@ const submitGame = async () => {
     nb_bouts: selectedBouts.value.length,
     nb_points: points.value,
     points_for: pointsFor.value,
+    bonuses: selectedBonuses.value,
+    enculette: enculette.value,
   };
 
   await axios.post("/api/games", gameData);
   alert("Game created successfully!");
 };
 </script>
-
-<style scoped>
-.animate-pulse {
-  animation: pulse 1.5s infinite;
-}
-@keyframes pulse {
-  0% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.5;
-  }
-}
-</style>
