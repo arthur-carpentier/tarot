@@ -44,6 +44,9 @@ class GameController extends Controller
             $game->defenseurs()->attach($defenseur);
         }
 
+        DB::statement("REFRESH MATERIALIZED VIEW game_scores");
+        DB::statement("REFRESH MATERIALIZED VIEW cumulated_scores");
+
         return response()->json($game, 201);
     }
 
@@ -62,9 +65,19 @@ class GameController extends Controller
     {
         $chart = DB::table('cumulated_scores')
             ->join('players', 'cumulated_scores.player_id', '=', 'players.id')
-            ->select('cumulated_scores.*', 'players.*')
-            ->groupBy('cumulated_scores.player_id')
+            ->select(
+                'players.id',
+                'players.name',
+                'players.color',
+                'players.photo',
+                DB::raw('json_agg(json_build_object(\'game_id\', cumulated_scores.game_id, \'cumulated_total_points\', cumulated_scores.cumulated_total_points)) as games_data')
+            )
+            ->groupBy('players.id', 'players.name', 'players.color', 'players.photo')
             ->get();
+        foreach ($chart as $player) {
+            $player->games_data = json_decode($player->games_data);
+        }
+
 
         return response()->json($chart);
     }

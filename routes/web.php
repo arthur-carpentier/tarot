@@ -19,6 +19,9 @@ Route::get('/new-game', function () {
 Route::get('/games', function () {
     return Inertia::render('Games');
 });
+Route::get('/chart', function () {
+    return Inertia::render('Chart');
+});
 
 Route::middleware([
     'auth:sanctum',

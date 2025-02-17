@@ -65,7 +65,7 @@ const isAdmin = computed(() => {
 
 const centeredMenuItems = computed(() => [
   { title: "Parties", link: "/games", icon: HomeIcon },
-  { title: "Graphique", link: "/charts", icon: ChartBarIcon },
+  { title: "Graphique", link: "/chart", icon: ChartBarIcon },
   { title: "Statistiques", link: "/stats", icon: ChartBarIcon },
 ]);
 
