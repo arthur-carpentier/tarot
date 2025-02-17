@@ -17,16 +17,25 @@
       </div>
 
       <!-- Skeleton Loader -->
-      <div v-if="loading" class="bg-green-800 p-6 rounded-lg shadow-lg">
-        <div
-          v-for="n in 5"
-          :key="n"
-          class="animate-pulse flex items-center space-x-4 py-2"
-        >
-          <div class="bg-gray-500 h-12 w-12 rounded-full"></div>
-          <div class="flex-1">
-            <div class="bg-gray-500 h-4 w-1/3 mb-2"></div>
-            <div class="bg-gray-500 h-4 w-1/4"></div>
+      <div v-if="loading" class="bg-green-800 p-6 rounded-lg shadow-lg h-[75vh]">
+        <div class="h-full w-full relative">
+          <div class="absolute inset-0 flex flex-col justify-between">
+            <div
+              v-for="n in 5"
+              :key="n"
+              class="flex items-center space-x-2 animate-pulse"
+            >
+              <div class="bg-gray-500 h-2 w-1/5 rounded"></div>
+              <div class="bg-gray-500 h-2 w-1/3 rounded"></div>
+              <div class="bg-gray-500 h-2 w-1/4 rounded"></div>
+            </div>
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 flex justify-between">
+            <div
+              v-for="n in 6"
+              :key="n"
+              class="bg-gray-500 h-6 w-10 rounded animate-pulse"
+            ></div>
           </div>
         </div>
       </div>
@@ -39,10 +48,10 @@
       <!-- Graphique des parties -->
       <div
         v-else
-        class="relative p-6 rounded-lg shadow-lg"
+        class="relative p-6 rounded-lg shadow-lg h-[75vh]"
         :style="{ backgroundColor: '#221E22' }"
       >
-        <LineChart :options="chartOptions" :chartData="chartDataFormatted" class="h-96" />
+        <LineChart :options="chartOptions" :chartData="chartDataFormatted" class="h-full" />
       </div>
     </main>
   </div>

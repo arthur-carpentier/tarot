@@ -15,7 +15,7 @@ class GameController extends Controller
         $validated = $request->validate([
             'annonce_id' => 'required|integer',
             'preneur' => 'required|integer',
-            'roi' => 'required|integer',
+            'roi' => 'nullable|integer',
             'defense' => 'required|array|',
             'nb_bouts' => 'required|integer|min:0|max:3',
             'nb_points' => 'required|numeric|min:1',
@@ -38,7 +38,9 @@ class GameController extends Controller
         $game->attaquants()->attach($validated['preneur'], ['roi' => false]);
 
         // Attach the roi
-        $game->attaquants()->attach($validated['roi'], ['roi' => true]);
+        if (isset($validated['roi'])) {
+            $game->attaquants()->attach($validated['roi'], ['roi' => true]);
+        }
 
         foreach ($validated['defense'] as $defenseur) {
             $game->defenseurs()->attach($defenseur);
