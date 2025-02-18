@@ -101,7 +101,7 @@ const chartDataFormatted = computed(() => {
       backgroundColor: player.color + "20",
       data: player.games_data.map((game) => game.cumulated_total_points),
       fill: false,
-      tension: 0,
+      tension: 0.2,
       playerPhoto: `/storage/${player.photo}`,
     })),
   };

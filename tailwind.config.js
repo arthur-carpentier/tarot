@@ -19,6 +19,17 @@ export default {
             fontFamily: {
                 sans: ['Poppins', 'Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                dark: {
+                    DEFAULT: "#0f0f0f",
+                    lighter: "#202020",
+                },
+                green: {
+                    bright: "#5dd62c",
+                    dark: "#337418",
+                },
+                light: "#f8f8f8",
+            },
         },
     },
 
