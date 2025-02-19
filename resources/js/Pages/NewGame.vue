@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex min-h-screen bg-green-900 text-white"
+    class="flex min-h-screen bg-dark text-light"
     style="font-family: 'Poppins', sans-serif"
   >
     <Sidebar class="fixed" />
@@ -20,7 +20,7 @@
                   :class="enculette ? 'bg-green-500' : 'bg-gray-500'"
                 >
                   <span
-                    class="absolute w-6 h-6 bg-white rounded-full transition-all duration-300"
+                    class="absolute w-6 h-6 bg-light rounded-full transition-all duration-300"
                     :class="enculette ? 'translate-x-7' : 'translate-x-1'"
                   ></span>
                 </div></div
@@ -236,7 +236,7 @@
                     '--fill-percent': (points / 91) * 100,
                   }"
                 />
-                <div class="flex text-sm text-white-700 -mt-1">
+                <div class="flex text-sm text-light-700 -mt-1">
                   <span>0</span>
                   <span class="ml-[37%]">36</span>
                   <span class="ml-[3.4%]">41</span>
@@ -252,7 +252,7 @@
                 min="0"
                 max="91"
                 step="0.5"
-                class="text-black p-1 rounded -translate-y-2 w-16"
+                class="text-dark p-1 rounded -translate-y-2 w-16"
               />
             </div>
           </div>
@@ -265,7 +265,7 @@
                 class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200 hover:brightness-110 hover:saturate-125"
                 :style="{ backgroundColor: '#dc2626' }"
                 :class="{
-                  'text-white': !pointsFort || pointsFor === 'attaque',
+                  'text-light': !pointsFort || pointsFor === 'attaque',
                   'scale-105 ml-2': pointsFor === 'attaque',
                   'grayscale opacity-50 hover:opacity-100 scale-95':
                     pointsFor && pointsFor !== 'attaque',
@@ -278,7 +278,7 @@
                 class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200 hover:brightness-110 hover:saturate-125"
                 :style="{ backgroundColor: '#2563eb' }"
                 :class="{
-                  'text-white': !pointsFort || pointsFor === 'defense',
+                  'text-light': !pointsFort || pointsFor === 'defense',
                   'scale-105 mr-2': pointsFor === 'defense',
                   'grayscale opacity-50 hover:opacity-100 scale-95':
                     pointsFor && pointsFor !== 'defense',
@@ -356,7 +356,7 @@
 
           <button
             type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded w-full text-2xl font-semibold"
+            class="bg-blue-600 text-light px-4 py-2 rounded w-full text-2xl font-semibold"
             :class="{
               'bg-gray-500 cursor-not-allowed': isDisabled,
             }"

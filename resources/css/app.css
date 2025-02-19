@@ -5,3 +5,19 @@
 [x-cloak] {
     display: none;
 }
+
+thead tr {
+    @apply bg-dark-lighter;
+}
+
+tbody tr {
+    @apply bg-dark-lighter hover:bg-dark-lightest;
+}
+
+#color::-webkit-color-swatch {
+    @apply rounded-lg shadow-lg;
+}
+
+#color::-moz-color-swatch {
+    @apply rounded-lg shadow-lg;
+}

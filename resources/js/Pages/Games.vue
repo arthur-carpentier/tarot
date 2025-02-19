@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex min-h-screen bg-green-900 text-white"
+    class="flex min-h-screen bg-dark text-light"
     style="font-family: 'Poppins', sans-serif"
   >
     <Sidebar class="fixed" />
@@ -10,14 +10,14 @@
         <h1 class="text-4xl font-bold">Liste des parties</h1>
         <Link
           href="/new-game"
-          class="bg-blue-500 px-4 py-2 rounded text-white font-semibold shadow-md hover:bg-blue-600 transition"
+          class="bg-green-dark px-4 py-2 rounded text-light font-semibold shadow-md hover:bg-green-bright transition"
         >
           + Ajouter une partie
         </Link>
       </div>
 
       <!-- Skeleton Loader -->
-      <div v-if="loading" class="bg-green-800 p-6 rounded-lg shadow-lg">
+      <div v-if="loading" class="bg-light rounded-lg shadow-lg">
         <div
           v-for="n in 5"
           :key="n"
@@ -37,10 +37,10 @@
       </p>
 
       <!-- Tableau des parties -->
-      <div v-else class="bg-green-800 p-6 rounded-lg shadow-lg overflow-x-auto">
+      <div v-else class="bg-green-dark rounded-lg shadow-lg overflow-x-auto">
         <table class="w-full border-collapse">
           <thead>
-            <tr class="bg-green-700 text-left text-white">
+            <tr class="bg-dark-lighter text-left text-light">
               <th class="p-3 border-b">ID</th>
               <th class="p-3 border-b">Date</th>
               <th class="p-3 border-b">Attaquants</th>
@@ -56,7 +56,7 @@
             <tr
               v-for="game in games"
               :key="game.id"
-              class="hover:bg-green-600 transition"
+              class="bg-dark-lighter hover:bg-green-dark transition"
             >
               <!-- ID -->
               <td class="p-3 border-b font-semibold">{{ game.id }}</td>
@@ -115,7 +115,7 @@
               <!-- Annonce -->
               <td class="p-3 border-b text-center">
                 <span
-                  class="px-3 py-1 rounded-lg text-white shadow"
+                  class="px-3 py-1 rounded-lg text-light shadow"
                   :style="{ backgroundColor: game.annonce.color }"
                 >
                   {{ game.annonce.name }}
@@ -131,7 +131,7 @@
                         ? 'fa-solid'
                         : 'fa-regular'
                     "
-                    class="fa-square text-black text-2xl mx-2"
+                    class="fa-square text-green-bright text-2xl mx-2"
                   ></i>
                   <i
                     :class="
@@ -139,7 +139,7 @@
                         ? 'fa-solid'
                         : 'fa-regular'
                     "
-                    class="fa-square text-black text-2xl mx-2"
+                    class="fa-square text-green-bright text-2xl mx-2"
                   ></i>
                   <i
                     :class="
@@ -147,7 +147,7 @@
                         ? 'fa-solid'
                         : 'fa-regular'
                     "
-                    class="fa-square text-black text-2xl mx-2"
+                    class="fa-square text-green-bright text-2xl mx-2"
                   ></i>
                 </span>
               </td>
@@ -155,7 +155,7 @@
               <!-- Enculette -->
               <td class="p-3 border-b text-center">
                 <span
-                  class="px-3 py-1 rounded-full text-white font-semibold"
+                  class="px-3 py-1 rounded-full text-light font-semibold"
                   :class="game.enculette ? 'bg-red-500' : 'bg-gray-700'"
                 >
                   {{ game.enculette ? "Oui" : "Non" }}
@@ -173,8 +173,8 @@
               <td class="p-3 border-b font-semibold text-center">
                 <span
                   class="rounded-full p-2"
-                  :style="{
-                    backgroundColor:
+                  :class="{
+                    'bg-green-bright':
                       (game.pointsForAttaque
                         ? parseFloat(game.nb_points) -
                           (game.nb_bouts === 0
@@ -192,9 +192,26 @@
                             ? 51
                             : 3 - game.nb_bouts === 2
                             ? 41
-                            : 36)) >= 0
-                        ? '#22c55e'
-                        : '#dc2626',
+                            : 36)) >= 0,
+                    'bg-red-500':
+                      (game.pointsForAttaque
+                        ? parseFloat(game.nb_points) -
+                          (game.nb_bouts === 0
+                            ? 56
+                            : game.nb_bouts === 1
+                            ? 51
+                            : game.nb_bouts === 2
+                            ? 41
+                            : 36)
+                        : 91 -
+                          parseFloat(game.nb_points) -
+                          (3 - game.nb_bouts === 0
+                            ? 56
+                            : 3 - game.nb_bouts === 1
+                            ? 51
+                            : 3 - game.nb_bouts === 2
+                            ? 41
+                            : 36)) < 0,
                   }"
                 >
                   {{

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex min-h-screen bg-green-900 text-white"
+    class="flex min-h-screen bg-dark text-light"
     style="font-family: 'Poppins', sans-serif"
   >
     <!-- Import Sidebar Component -->
@@ -25,7 +25,7 @@
         <div class="mt-6">
           <Link
             href="/dashboard"
-            class="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:bg-yellow-600 transition"
+            class="px-6 py-3 bg-yellow-500 text-light font-semibold rounded-lg shadow-lg hover:bg-yellow-600 transition"
           >
             Commencer
           </Link>

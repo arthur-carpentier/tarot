@@ -23,6 +23,7 @@ export default {
                 dark: {
                     DEFAULT: "#0f0f0f",
                     lighter: "#202020",
+                    lightest: "#404040",
                 },
                 green: {
                     bright: "#5dd62c",

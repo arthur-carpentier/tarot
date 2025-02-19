@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex min-h-screen bg-green-900 text-white"
+    class="flex min-h-screen bg-dark text-light"
     style="font-family: 'Poppins', sans-serif"
   >
     <Sidebar class="fixed" />
@@ -10,14 +10,14 @@
         <h1 class="text-4xl font-bold">Graphique d'évolution des points</h1>
         <Link
           href="/new-game"
-          class="bg-blue-500 px-4 py-2 rounded text-white font-semibold shadow-md hover:bg-blue-600 transition"
+          class="bg-blue-500 px-4 py-2 rounded text-light font-semibold shadow-md hover:bg-blue-600 transition"
         >
           + Ajouter une partie
         </Link>
       </div>
 
       <!-- Skeleton Loader -->
-      <div v-if="loading" class="bg-green-800 p-6 rounded-lg shadow-lg h-[75vh]">
+      <div v-if="loading" class="bg-dark-lighter p-6 rounded-lg shadow-lg h-[75vh]">
         <div class="h-full w-full relative">
           <div class="absolute inset-0 flex flex-col justify-between">
             <div

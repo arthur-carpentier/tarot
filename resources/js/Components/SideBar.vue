@@ -1,13 +1,15 @@
 <template>
-  <aside class="w-64 bg-green-800 p-6 shadow-lg flex flex-col justify-between h-screen">
+  <aside
+    class="w-64 bg-light p-6 shadow-lg flex flex-col justify-between h-screen text-dark"
+  >
     <div>
       <Link href="/">
-        <h2 class="text-2xl font-bold mb-6 text-center">Tarot</h2>
+        <h2 class="text-4xl font-bold mb-6 text-center text-dark hover:text-dark-lighter">Tarot</h2>
       </Link>
-      <div class="mb-6 bg-green-700 rounded-lg">
+      <div class="mb-6 bg-dark rounded-lg text-light">
         <Link
           href="/new-game"
-          class="flex items-center space-x-3 p-4 rounded-lg hover:bg-green-600 transition"
+          class="flex items-center space-x-3 p-4 rounded-lg hover:bg-dark-lighter transition"
         >
           <PlayIcon class="w-6 h-6" />
           <span>Nouvelle partie</span>
@@ -20,7 +22,7 @@
         <li v-for="item in centeredMenuItems" :key="item.title">
           <Link
             :href="item.link"
-            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-green-700 transition"
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-dark-lighter hover:text-light transition"
           >
             <component :is="item.icon" class="w-6 h-6" />
             <span>{{ item.title }}</span>
@@ -35,7 +37,7 @@
           <li v-for="item in adminMenuItems" :key="item.title">
             <Link
               :href="item.link"
-              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-green-700 transition"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-dark-lighter hover:text-light transition"
             >
               <component :is="item.icon" class="w-6 h-6" />
               <span>{{ item.title }}</span>
