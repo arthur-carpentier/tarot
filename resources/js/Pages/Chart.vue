@@ -51,7 +51,11 @@
         class="relative p-6 rounded-lg shadow-lg h-[75vh]"
         :style="{ backgroundColor: '#221E22' }"
       >
-        <LineChart :options="chartOptions" :chartData="chartDataFormatted" class="h-full" />
+        <LineChart
+          :options="chartOptions"
+          :chartData="chartDataFormatted"
+          class="h-full"
+        />
       </div>
     </main>
   </div>
@@ -74,18 +78,24 @@ onMounted(async () => {
   await fetchChartData();
 });
 
+// Au début du bloc <Script setup>, ajoutez :
+const playerColors = ref([]);
+
+// Modifiez la fonction fetchChartData comme ceci :
 const fetchChartData = async () => {
   loading.value = true;
   try {
     const response = await fetch("/api/chart");
     chartData.value = response.status === 204 ? [] : await response.json();
+
+    // Initialisez playerColors avec les couleurs des joueurs
+    playerColors.value = chartData.value.map((player) => player.color);
   } catch (error) {
     console.error("Erreur de récupération des parties :", error);
   } finally {
     loading.value = false;
   }
 };
-
 // Computed property to transform API data into Chart.js format
 const chartDataFormatted = computed(() => {
   if (chartData.value.length === 0) return {};
@@ -99,6 +109,7 @@ const chartDataFormatted = computed(() => {
       label: player.name,
       borderColor: player.color,
       backgroundColor: player.color + "20",
+      pointBorderColor: "#00000000",
       data: player.games_data.map((game) => game.cumulated_total_points),
       fill: false,
       tension: 0.2,
@@ -113,7 +124,7 @@ const chartOptions = {
   maintainAspectRatio: false,
   layout: {
     padding: {
-      right: 80, // Ensure more space for images
+      right: 80,
     },
     backgroundColor: "#221E22",
   },
@@ -121,9 +132,9 @@ const chartOptions = {
     legend: {
       display: true,
       labels: {
-        color: "#FFFFFF", // Force white
+        color: "#FFFFFF",
         font: {
-          family: "'Poppins', sans-serif", // Ensure Poppins
+          family: "'Poppins', sans-serif",
           size: 14,
         },
       },
@@ -136,7 +147,7 @@ const chartOptions = {
   scales: {
     x: {
       grid: {
-        color: "rgba(255, 255, 255, 0.2)", // Softer grid color
+        color: "rgba(255, 255, 255, 0.2)",
       },
       ticks: {
         color: "#FFFFFF",
@@ -158,6 +169,52 @@ const chartOptions = {
         },
       },
     },
+  },
+  onHover: (event, activeElements) => {
+    const chart = event.chart;
+
+    // Determine if any dataset is currently hovered
+    const isHovered = activeElements.length > 0;
+
+    chart.data.datasets.forEach((dataset, index) => {
+      dataset.borderColor =
+        playerColors.value[index] +
+        (isHovered
+          ? activeElements.some((active) => active.datasetIndex === index)
+            ? "FF"
+            : "22"
+          : "FF");
+
+      const element = chart.getDatasetMeta(index);
+      if (element) {
+        element.hidden = false;
+
+        chart.update("none");
+      }
+    });
+
+    chart.data.datasets.forEach((dataset, currentIndex) => {
+      const photoUrl = `${dataset.playerPhoto}`;
+      const img = chart.imageCache.get(photoUrl);
+      if (img) {
+        const playerIndex =
+          currentIndex >= 0 && chart.data.datasets[currentIndex].playerPhoto === photoUrl
+            ? currentIndex
+            : -1;
+
+        img.style.opacity = isHovered
+          ? activeElements.some((active) => active.datasetIndex === playerIndex)
+            ? 1
+            : 0.1
+          : 1;
+
+        img.style.zIndex = isHovered
+          ? activeElements.some((active) => active.datasetIndex === playerIndex)
+            ? 2
+            : 1
+          : 1;
+      }
+    });
   },
 };
 
