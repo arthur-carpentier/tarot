@@ -21,11 +21,11 @@
       <div v-for="n in 5" :key="n" class="animate-pulse flex items-center space-x-4 py-2">
         <div
           v-if="title === 'Gestion des joueurs'"
-          class="bg-gray-500 h-12 w-12 rounded-full"
+          class="bg-dark-lightest h-12 w-12 rounded-full"
         ></div>
         <div class="flex-1">
-          <div class="bg-gray-500 h-4 w-1/3 mb-2"></div>
-          <div class="bg-gray-500 h-4 w-1/4"></div>
+          <div class="bg-dark-lightest h-4 w-1/3 mb-2"></div>
+          <div class="bg-dark-lightest h-4 w-1/4"></div>
         </div>
       </div>
     </div>
@@ -55,7 +55,7 @@
             >
               Couleur
             </td>
-            <td v-if="title === 'Annonces'" class="p-3">Multiplicateur</td>
+            <td v-if="title === 'Annonces'" class="p-3 text-center">Multiplicateur</td>
             <td v-if="title === 'Bonus'" class="p-3 text-center">Points</td>
             <td class="p-3 text-center"></td>
           </tr>

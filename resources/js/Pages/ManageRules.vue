@@ -5,9 +5,6 @@
   >
     <Sidebar class="fixed" />
     <main class="ml-64 flex-1 px-6 py-10 relative">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-4xl font-bold">Gestion des règles</h1>
-      </div>
       <div class="space-y-20">
         <!-- Section Component -->
         <Section

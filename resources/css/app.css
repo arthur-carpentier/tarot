@@ -7,7 +7,7 @@
 }
 
 thead tr {
-    @apply bg-dark-lighter font-bold text-light-darker;
+    @apply bg-dark-lighter text-light-darker;
 }
 
 tbody tr {

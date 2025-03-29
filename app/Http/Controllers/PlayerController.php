@@ -45,11 +45,11 @@ class PlayerController extends Controller
             // Join with cumulated_scores to get the latest score and game info
             ->leftJoinSub(function ($query) {
                 $query->select(
-                        'cumulated_scores.player_id',
-                        'cumulated_scores.cumulated_total_points',
-                        'cumulated_scores.game_id',
-                        'games.created_at'
-                    )
+                    'cumulated_scores.player_id',
+                    'cumulated_scores.cumulated_total_points',
+                    'cumulated_scores.game_id',
+                    'games.created_at'
+                )
                     ->from('cumulated_scores')
                     ->join('games', 'games.id', '=', 'cumulated_scores.game_id')
                     ->joinSub(function ($subQuery) {
@@ -60,31 +60,31 @@ class PlayerController extends Controller
                             ->groupBy('player_id');
                     }, 'latest_game', function ($join) {
                         $join->on('cumulated_scores.player_id', '=', 'latest_game.player_id')
-                             ->on('games.created_at', '=', 'latest_game.latest_game_date');
+                            ->on('games.created_at', '=', 'latest_game.latest_game_date');
                     });
             }, 'latest_score', function ($join) {
                 $join->on('players.id', '=', 'latest_score.player_id');
             })
-            // Now join with previous score (last game before the latest game)
+            // Now join with previous score (last game from a different day than the latest game)
             ->leftJoinSub(function ($query) {
                 $query->select(
-                        'cumulated_scores.player_id',
-                        'cumulated_scores.cumulated_total_points',
-                        'cumulated_scores.game_id',
-                        'games.created_at'
-                    )
+                    'cumulated_scores.player_id',
+                    'cumulated_scores.cumulated_total_points',
+                    'cumulated_scores.game_id',
+                    'games.created_at'
+                )
                     ->from('cumulated_scores')
                     ->join('games', 'games.id', '=', 'cumulated_scores.game_id')
                     ->joinSub(function ($subQuery) {
-                        // Find the last game before the latest game
+                        // Find the most recent game from a day prior to the latest game day
                         $subQuery->selectRaw('MAX(games.created_at) AS previous_game_date, player_id')
                             ->from('cumulated_scores')
                             ->join('games', 'games.id', '=', 'cumulated_scores.game_id')
-                            ->where('games.created_at', '<', DB::raw('(SELECT MAX(games.created_at) FROM games)'))
+                            ->where(DB::raw('DATE(games.created_at)'), '<', DB::raw('(SELECT DATE(MAX(games.created_at)) FROM games)'))
                             ->groupBy('player_id');
                     }, 'previous_game', function ($join) {
                         $join->on('cumulated_scores.player_id', '=', 'previous_game.player_id')
-                             ->on('games.created_at', '=', 'previous_game.previous_game_date');
+                            ->on('games.created_at', '=', 'previous_game.previous_game_date');
                     });
             }, 'previous_score', function ($join) {
                 $join->on('players.id', '=', 'previous_score.player_id');

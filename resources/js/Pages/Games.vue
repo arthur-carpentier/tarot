@@ -10,59 +10,66 @@
         <h1 class="text-4xl font-bold">Liste des parties</h1>
         <Link
           href="/new-game"
-          class="bg-green-dark px-4 py-2 rounded text-light font-semibold shadow-md hover:bg-green-bright transition"
+          class="bg-green-dark px-4 py-2 rounded text-light font-semibold shadow-md hover:bg-green-bright hover:text-dark transition"
         >
           + Ajouter une partie
         </Link>
       </div>
 
       <!-- Skeleton Loader -->
-      <div v-if="loading" class="bg-light rounded-lg shadow-lg">
+      <div
+        v-if="loading"
+        class="rounded-lg shadow-lg p-6 border border-dark-lightest bg-dark-lighter"
+      >
         <div
           v-for="n in 5"
           :key="n"
           class="animate-pulse flex items-center space-x-4 py-2"
         >
-          <div class="bg-gray-500 h-12 w-12 rounded-full"></div>
+          <div class="bg-dark-lightest h-12 w-12 rounded-full"></div>
           <div class="flex-1">
-            <div class="bg-gray-500 h-4 w-1/3 mb-2"></div>
-            <div class="bg-gray-500 h-4 w-1/4"></div>
+            <div class="bg-dark-lightest h-4 w-1/3 mb-2"></div>
+            <div class="bg-dark-lightest h-4 w-1/4"></div>
           </div>
         </div>
       </div>
 
       <!-- Si aucune partie -->
-      <p v-else-if="games.length === 0" class="text-center text-gray-300 text-lg">
+      <p
+        v-else-if="games.length === 0"
+        class="text-center text-gray-300 text-lg p-6 border border-dark-lightest bg-dark-lighter"
+      >
         Aucune partie enregistrée pour le moment.
       </p>
 
       <!-- Tableau des parties -->
-      <div v-else class="bg-green-dark rounded-lg shadow-lg overflow-x-auto">
+      <div
+        v-else
+        class="rounded-lg shadow-lg overflow-x-auto p-6 border border-dark-lightest bg-dark-lighter"
+      >
         <table class="w-full border-collapse">
           <thead>
-            <tr class="bg-dark-lighter text-left text-light">
-              <th class="p-3 border-b">ID</th>
-              <th class="p-3 border-b">Date</th>
-              <th class="p-3 border-b">Attaquants</th>
-              <th class="p-3 border-b">Défenseurs</th>
-              <th class="p-3 border-b text-center">Annonce</th>
-              <th class="p-3 border-b text-center">Bouts</th>
-              <th class="p-3 border-b text-center">Enculette</th>
-              <th class="p-3 border-b text-right">Points</th>
-              <th class="p-3 border-b text-center">Faite</th>
+            <tr class="bg-dark-lighter text-left">
+              <td class="p-3">ID</td>
+              <td class="p-3">Date</td>
+              <td class="p-3">Attaquants</td>
+              <td class="p-3">Défenseurs</td>
+              <td class="p-3 text-center">Annonce</td>
+              <td class="p-3 text-center">Bouts</td>
+              <td class="p-3 text-center">Enculette</td>
+              <td class="p-3 text-right">Points</td>
+              <td class="p-3 text-center">Faite</td>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="game in games"
-              :key="game.id"
-              class="bg-dark-lighter hover:bg-green-dark transition"
-            >
+            <tr v-for="game in games" :key="game.id">
               <!-- ID -->
-              <td class="p-3 border-b font-semibold">{{ game.id }}</td>
+              <td class="p-3 border-t border-t-dark-lightest font-semibold">
+                {{ game.id }}
+              </td>
 
               <!-- Date -->
-              <td class="p-3 border-b">
+              <td class="p-3 border-t border-t-dark-lightest">
                 {{
                   new Date(game.created_at).toLocaleString("fr-FR", {
                     day: "2-digit",
@@ -75,7 +82,7 @@
               </td>
 
               <!-- Attaquants -->
-              <td class="p-3 border-b">
+              <td class="p-3 border-t border-t-dark-lightest">
                 <div class="flex space-x-2">
                   <img
                     v-for="attaquant in [...game.attaquants].sort((a, b) =>
@@ -97,7 +104,7 @@
               </td>
 
               <!-- Défenseurs -->
-              <td class="p-3 border-b">
+              <td class="p-3 border-t border-t-dark-lightest">
                 <div class="flex space-x-2">
                   <img
                     v-for="defenseur in game.defenseurs"
@@ -113,7 +120,7 @@
               </td>
 
               <!-- Annonce -->
-              <td class="p-3 border-b text-center">
+              <td class="p-3 border-t border-t-dark-lightest text-center">
                 <span
                   class="px-3 py-1 rounded-lg text-light shadow"
                   :style="{ backgroundColor: game.annonce.color }"
@@ -123,7 +130,7 @@
               </td>
 
               <!-- Bouts -->
-              <td class="p-3 border-b font-semibold text-center">
+              <td class="p-3 border-t border-t-dark-lightest font-semibold text-center">
                 <span>
                   <i
                     :class="
@@ -153,7 +160,7 @@
               </td>
 
               <!-- Enculette -->
-              <td class="p-3 border-b text-center">
+              <td class="p-3 border-t border-t-dark-lightest text-center">
                 <span
                   class="px-3 py-1 rounded-full text-light font-semibold"
                   :class="game.enculette ? 'bg-red-500' : 'bg-gray-700'"
@@ -163,14 +170,14 @@
               </td>
 
               <!-- Points pour l'attaque -->
-              <td class="p-3 border-b font-semibold text-right">
+              <td class="p-3 border-t border-t-dark-lightest font-semibold text-right">
                 {{
                   game.pointsForAttaque
                     ? parseFloat(game.nb_points).toFixed(1) + "pts"
                     : (91 - parseFloat(game.nb_points)).toFixed(1) + "pts"
                 }}
               </td>
-              <td class="p-3 border-b font-semibold text-center">
+              <td class="p-3 border-t border-t-dark-lightest font-semibold text-center">
                 <span
                   class="rounded-full p-2"
                   :class="{
