@@ -20,7 +20,8 @@
         :type="modalType"
         :is-editing="isEditing"
         :form="form"
-        @save="saveItem"
+        @update="updatePlayer"
+        @create="createPlayer"
         @close="showModal = false"
       />
     </main>
@@ -35,10 +36,6 @@ import Modal from "@/Components/Modal.vue";
 
 const players = ref([]);
 const loading = ref(true);
-const showEditModal = ref(false);
-const showCreateModal = ref(false);
-const editedPlayer = ref({ id: null, name: "", color: "#FFFFFF", photo: null });
-const newPlayer = ref({ name: "", color: "#FFFFFF", photo: null });
 const selectedFile = ref(null);
 const newFile = ref(null);
 const showModal = ref(false);
@@ -79,52 +76,34 @@ const handleModalOpen = ({ type, item, itemType }) => {
     : { id: null, name: "", color: "#FFFFFF", multiplicateur: 1, points: 0, photo: null };
 };
 
-const openEditModal = (player) => {
-  editedPlayer.value = { ...player };
-  showEditModal.value = true;
-};
-
-const openCreateModal = () => {
-  newPlayer.value = { name: "", color: "#FFFFFF", photo: null };
-  newFile.value = null;
-  showCreateModal.value = true;
-};
-
-const handleFileUpload = (event) => {
-  selectedFile.value = event.target.files[0];
-};
-
-const handleNewFileUpload = (event) => {
-  newFile.value = event.target.files[0];
-};
-
 const updatePlayer = async () => {
   const formData = new FormData();
-  formData.append("name", editedPlayer.value.name);
-  formData.append("color", editedPlayer.value.color);
+  formData.append("name", form.value.name);
+  formData.append("color", form.value.color);
   if (selectedFile.value) {
     formData.append("photo", selectedFile.value);
   }
 
   try {
-    const response = await fetch(`/api/player/update/${editedPlayer.value.id}`, {
+    const response = await fetch(`/api/player/update/${form.value.id}`, {
       method: "POST",
       body: formData,
     });
 
     if (!response.ok) throw new Error("Erreur lors de la mise à jour");
 
-    showEditModal.value = false;
     await fetchPlayers();
   } catch (error) {
     console.error("Erreur de mise à jour :", error);
+  } finally {
+    showModal.value = false;
   }
 };
 
 const createPlayer = async () => {
   const formData = new FormData();
-  formData.append("name", newPlayer.value.name);
-  formData.append("color", newPlayer.value.color);
+  formData.append("name", form.value.name);
+  formData.append("color", form.value.color);
   if (newFile.value) {
     formData.append("photo", newFile.value);
   }
@@ -137,10 +116,11 @@ const createPlayer = async () => {
 
     if (!response.ok) throw new Error("Erreur lors de la création");
 
-    showCreateModal.value = false;
     await fetchPlayers();
   } catch (error) {
     console.error("Erreur de création :", error);
+  } finally {
+    showModal.value = false;
   }
 };
 </script>

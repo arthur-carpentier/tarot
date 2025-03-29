@@ -120,7 +120,7 @@ const props = defineProps({
   form: Object,
 });
 
-const emit = defineEmits(["save", "close"]);
+const emit = defineEmits(["create", "update", "create", "close"]);
 
 const newFile = ref(null);
 
@@ -144,7 +144,7 @@ const getImageSource = computed(() => {
 });
 
 const save = () => {
-  emit("save", {
+  emit(props.isEditing ? "update" : "create", {
     ...props.form,
     photo: newFile.value,
   });

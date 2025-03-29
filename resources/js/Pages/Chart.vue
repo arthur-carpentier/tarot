@@ -122,6 +122,7 @@ const chartDataFormatted = computed(() => {
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  animation: 200,
   layout: {
     padding: {
       right: 80,
@@ -138,10 +139,120 @@ const chartOptions = {
           size: 14,
         },
       },
+      onHover: (event, activeElements) => {
+        const chart = event.chart;
+
+        // Determine if any dataset is currently hovered
+        const isHovered = activeElements !== null;
+
+        chart.data.datasets.forEach((dataset, index) => {
+          dataset.borderColor =
+            playerColors.value[index] +
+            (isHovered ? (activeElements.datasetIndex === index ? "FF" : "22") : "FF");
+
+          const element = chart.getDatasetMeta(index);
+          if (element) {
+            element.hidden = false;
+
+            chart.update("none");
+          }
+        });
+
+        chart.data.datasets.forEach((dataset, currentIndex) => {
+          const photoUrl = `${dataset.playerPhoto}`;
+          const img = chart.imageCache.get(photoUrl);
+          if (img) {
+            const playerIndex =
+              currentIndex >= 0 &&
+              chart.data.datasets[currentIndex].playerPhoto === photoUrl
+                ? currentIndex
+                : -1;
+
+            img.style.opacity = isHovered
+              ? activeElements.datasetIndex === playerIndex
+                ? 1
+                : 0.1
+              : 1;
+
+            img.style.zIndex = isHovered
+              ? activeElements.datasetIndex === playerIndex
+                ? 2
+                : 1
+              : 1;
+          }
+        });
+      },
+      onLeave: (event) => {
+        const chart = event.chart;
+
+        chart.data.datasets.forEach((dataset, index) => {
+          dataset.borderColor = playerColors.value[index] + "FF";
+          const element = chart.getDatasetMeta(index);
+          if (element) {
+            element.hidden = false;
+
+            chart.update("none");
+          }
+        });
+
+        chart.data.datasets.forEach((dataset, currentIndex) => {
+          const photoUrl = `${dataset.playerPhoto}`;
+          const img = chart.imageCache.get(photoUrl);
+          if (img) {
+            img.style.opacity = 1;
+
+            img.style.zIndex = 1;
+          }
+        });
+      },
     },
     tooltip: {
+      enabled: true,
       mode: "index",
       intersect: false,
+      backgroundColor: "rgba(34, 30, 34, 0.95)",
+      titleColor: "#FFFFFF",
+      bodyColor: "#FFFFFF",
+      footerColor: "#FFFFFF",
+      callbacks: {
+        title: (tooltipItems) => {
+          const gameIndex = tooltipItems[0].dataIndex;
+          return `Partie ${gameIndex + 1}`;
+        },
+        label: (tooltipItem) => {
+          const dataset = chartData.value[tooltipItem.datasetIndex];
+          const playerName = dataset.name;
+          const score = tooltipItem.raw;
+          return `${playerName}: ${score.toFixed(1)} points`;
+        },
+        labelColor: (tooltipItem) => ({
+          borderColor: chartData.value[tooltipItem.datasetIndex].color,
+          backgroundColor: chartData.value[tooltipItem.datasetIndex].color,
+          borderWidth: 0,
+          borderRadius: 4,
+        }),
+        filter: (tooltipItem) => {
+          console.log("Filter callback:", {
+            value: tooltipItem.raw,
+            result: tooltipItem.raw !== 0,
+          });
+          return tooltipItem.raw !== 0;
+        },
+        itemSort: (items) => {
+          console.log(chartData);
+          const sorted = items.sort((a, b) => b.raw - a.raw);
+          console.log(
+            "After sort:",
+            sorted.map((item) => item.raw)
+          );
+          return sorted;
+        },
+      },
+      padding: 12,
+      caretSize: 6,
+      caretPadding: 8,
+      cornerRadius: 8,
+      displayColors: true,
     },
   },
   scales: {
@@ -188,7 +299,6 @@ const chartOptions = {
       const element = chart.getDatasetMeta(index);
       if (element) {
         element.hidden = false;
-
         chart.update("none");
       }
     });
@@ -213,6 +323,28 @@ const chartOptions = {
             ? 2
             : 1
           : 1;
+      }
+    });
+  },
+  onLeave: (event) => {
+    const chart = event.chart;
+
+    chart.data.datasets.forEach((dataset, index) => {
+      dataset.borderColor = playerColors.value[index] + "FF";
+
+      const element = chart.getDatasetMeta(index);
+      if (element) {
+        element.hidden = false;
+        chart.update("none");
+      }
+    });
+
+    chart.data.datasets.forEach((dataset, currentIndex) => {
+      const photoUrl = `${dataset.playerPhoto}`;
+      const img = chart.imageCache.get(photoUrl);
+      if (img) {
+        img.style.opacity = 1;
+        img.style.zIndex = 1;
       }
     });
   },

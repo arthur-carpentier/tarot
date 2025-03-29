@@ -1,15 +1,15 @@
 <template>
   <aside
-    class="w-64 bg-light p-6 shadow-lg flex flex-col justify-between h-screen text-dark"
+    class="w-64 bg-dark-lighter p-6 shadow-lg flex flex-col justify-between h-screen text-light"
   >
     <div>
       <Link href="/">
-        <h2 class="text-4xl font-bold mb-6 text-center text-dark hover:text-dark-lighter">Tarot</h2>
+        <h2 class="text-4xl font-bold mb-6 text-center text-light hover:text-light-darker">Tarot</h2>
       </Link>
       <div class="mb-6 bg-dark rounded-lg text-light">
         <Link
           href="/new-game"
-          class="flex items-center space-x-3 p-4 rounded-lg hover:bg-dark-lighter transition"
+          class="flex items-center space-x-3 p-4 rounded-lg hover:bg-green-bright bg-green-dark hover:text-dark transition-all"
         >
           <PlayIcon class="w-6 h-6" />
           <span>Nouvelle partie</span>
@@ -22,7 +22,7 @@
         <li v-for="item in centeredMenuItems" :key="item.title">
           <Link
             :href="item.link"
-            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-dark-lighter hover:text-light transition"
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-dark-lightest hover:text-light transition"
           >
             <component :is="item.icon" class="w-6 h-6" />
             <span>{{ item.title }}</span>
@@ -37,7 +37,7 @@
           <li v-for="item in adminMenuItems" :key="item.title">
             <Link
               :href="item.link"
-              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-dark-lighter hover:text-light transition"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-dark-lightest hover:text-light transition"
             >
               <component :is="item.icon" class="w-6 h-6" />
               <span>{{ item.title }}</span>
@@ -54,11 +54,14 @@ import { computed } from "vue";
 import { Link } from "@inertiajs/vue3";
 import {
   HomeIcon,
+  MenuIcon,
   ChartBarIcon,
+  TrendingUpIcon,
   UserIcon,
   UsersIcon,
   CogIcon,
   PlayIcon,
+  ViewListIcon,
 } from "@heroicons/vue/outline";
 
 const isAdmin = computed(() => {
@@ -66,8 +69,8 @@ const isAdmin = computed(() => {
 });
 
 const centeredMenuItems = computed(() => [
-  { title: "Parties", link: "/games", icon: HomeIcon },
-  { title: "Graphique", link: "/chart", icon: ChartBarIcon },
+  { title: "Parties", link: "/games", icon: ViewListIcon },
+  { title: "Graphique", link: "/chart", icon: TrendingUpIcon },
   { title: "Statistiques", link: "/stats", icon: ChartBarIcon },
 ]);
 

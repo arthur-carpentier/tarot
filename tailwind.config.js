@@ -29,7 +29,10 @@ export default {
                     bright: "#5dd62c",
                     dark: "#337418",
                 },
-                light: "#f8f8f8",
+                light: {
+                    DEFAULT: "#f8f8f8",
+                    darker: "#bbbbbb",
+                },
             },
         },
     },

@@ -7,11 +7,11 @@
 }
 
 thead tr {
-    @apply bg-dark-lighter;
+    @apply bg-dark-lighter font-bold text-light-darker;
 }
 
 tbody tr {
-    @apply bg-dark-lighter hover:bg-dark-lightest;
+    @apply bg-dark-lighter hover:bg-dark-lightest font-bold;
 }
 
 #color::-webkit-color-swatch {

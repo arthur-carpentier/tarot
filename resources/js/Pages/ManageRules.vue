@@ -30,7 +30,8 @@
         :type="modalType"
         :is-editing="isEditing"
         :form="form"
-        @save="saveItem"
+        @update="updateItem"
+        @create="createItem"
         @close="showModal = false"
       />
     </main>
@@ -82,12 +83,10 @@ const handleModalOpen = ({ type, item, itemType }) => {
     : { id: null, name: "", color: "#FFFFFF", multiplicateur: 1, points: 0 };
 };
 
-const saveItem = async () => {
+const updateItem = async () => {
   const isAnnonce = modalType.value === "annonce";
   const item = form.value;
-  const url = item.id
-    ? `/api/${modalType.value}/update/${item.id}`
-    : `/api/${modalType.value}/store`;
+  const url = `/api/${modalType.value}/update/${item.id}`;
 
   try {
     const response = await fetch(url, {
@@ -102,6 +101,30 @@ const saveItem = async () => {
     fetchData(isAnnonce ? "annonces" : "bonuses");
   } catch (error) {
     console.error("Erreur d'enregistrement:", error);
+  } finally {
+    showModal = false;
+  }
+};
+const createItem = async () => {
+  const isAnnonce = modalType.value === "annonce";
+  const item = form.value;
+  const url = `/api/${modalType.value}/store`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(item),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) throw new Error("Erreur lors de l'enregistrement.");
+
+    showModal.value = false;
+    fetchData(isAnnonce ? "annonces" : "bonuses");
+  } catch (error) {
+    console.error("Erreur d'enregistrement:", error);
+  } finally {
+    showModal = false;
   }
 };
 </script>
