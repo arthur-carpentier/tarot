@@ -31,7 +31,7 @@
 
     <div
       v-else
-      class="relative p-6 rounded-lg shadow-lg h-[75vh] border border-navy/10 bg-watergreen dark:border-white/10 dark:bg-navy"
+      class="relative p-2 md:p-6 rounded-lg shadow-lg h-[60vh] md:h-[75vh] border border-navy/10 bg-watergreen dark:border-white/10 dark:bg-navy"
     >
       <LineChart
         :key="isDark"
@@ -83,14 +83,18 @@ const chartDataFormatted = computed(() => {
   };
 });
 
+// Sur mobile : marges réduites, polices plus petites, avatars compacts
+const isNarrow = () => window.innerWidth < 768;
+
 const chartOptions = computed(() => {
   const ink = isDark.value ? "#FFFFFF" : "#113B54";
   const grid = isDark.value ? "rgba(255, 255, 255, 0.2)" : "rgba(17, 59, 84, 0.15)";
+  const narrow = isNarrow();
   const axis = {
     grid: { color: grid },
     ticks: {
       color: ink,
-      font: { family: "'Poppins', sans-serif", size: 12 },
+      font: { family: "'Poppins', sans-serif", size: narrow ? 10 : 12 },
     },
   };
   return {
@@ -99,7 +103,7 @@ const chartOptions = computed(() => {
     animation: 200,
     layout: {
       padding: {
-        right: 80,
+        right: narrow ? 40 : 80,
       },
     },
     plugins: {
@@ -107,9 +111,10 @@ const chartOptions = computed(() => {
         display: true,
         labels: {
           color: ink,
+          boxWidth: narrow ? 20 : 40,
           font: {
             family: "'Poppins', sans-serif",
-            size: 14,
+            size: narrow ? 11 : 14,
           },
         },
       },
@@ -159,8 +164,8 @@ const initialsAvatarPlugin = {
       if (!meta || meta.hidden || !meta.data.length) return;
 
       const lastPoint = meta.data[meta.data.length - 1];
-      const size = 30;
-      const x = lastPoint.x + 15 + size / 2;
+      const size = chart.width < 500 ? 22 : 30;
+      const x = lastPoint.x + (chart.width < 500 ? 8 : 15) + size / 2;
       const y = lastPoint.y;
 
       ctx.save();
@@ -172,7 +177,7 @@ const initialsAvatarPlugin = {
       ctx.lineWidth = 2;
       ctx.stroke();
       ctx.fillStyle = "#113B54";
-      ctx.font = "bold 11px Poppins, sans-serif";
+      ctx.font = `bold ${size < 30 ? 8 : 11}px Poppins, sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(playerInitials(dataset.playerName), x, y + 1);

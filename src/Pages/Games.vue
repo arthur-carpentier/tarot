@@ -42,10 +42,88 @@
       Aucune partie enregistrée pour le moment.
     </p>
 
-    <div
-      v-else
-      class="rounded-lg shadow-lg overflow-x-auto p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy"
-    >
+    <template v-else>
+      <!-- Mobile : une carte par partie -->
+      <div class="md:hidden space-y-3">
+        <div
+          v-for="game in sortedGames"
+          :key="game.numero"
+          class="rounded-lg shadow p-3 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy"
+        >
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <span class="font-bold text-navy/60 dark:text-periwinkle/80">
+              n°{{ game.numero }}
+            </span>
+            <span
+              class="px-2 py-0.5 rounded text-sm font-semibold ring-1 ring-navy/20 dark:ring-white/30 whitespace-nowrap"
+              :style="annonceStyle(game.annonce)"
+            >
+              {{ game.annonce }}
+            </span>
+            <span
+              class="rounded-full px-2.5 py-1 text-sm font-bold whitespace-nowrap"
+              :class="game.fait ? 'bg-chartreuse text-navy' : 'bg-red-600 text-white'"
+            >
+              {{ (game.prisChuteDe >= 0 ? "+" : "") + game.prisChuteDe.toFixed(1) }}
+            </span>
+          </div>
+
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex -space-x-1.5">
+              <PlayerAvatar
+                :name="game.preneur"
+                size="sm"
+                class="outline outline-2 outline-red-500"
+              />
+              <PlayerAvatar
+                v-if="game.appele && game.appele !== game.preneur"
+                :name="game.appele"
+                size="sm"
+                class="outline outline-2 outline-yellow-500"
+              />
+            </div>
+            <span class="text-xs font-bold text-navy/40 dark:text-periwinkle/60">VS</span>
+            <div class="flex -space-x-1.5">
+              <PlayerAvatar
+                v-for="defenseur in game.defenseurs"
+                :key="defenseur"
+                :name="defenseur"
+                size="sm"
+                class="outline outline-2 outline-blue-500"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-2 mt-3 text-sm">
+            <span class="whitespace-nowrap">
+              <i
+                v-for="n in 3"
+                :key="n"
+                :class="game.boutsAttaque >= n ? 'fa-solid' : 'fa-regular'"
+                class="fa-square text-pine dark:text-chartreuse mx-0.5"
+              ></i>
+            </span>
+            <span class="font-semibold whitespace-nowrap">
+              {{ game.pointsAttaque.toFixed(1) }} / {{ game.pointsAFaire }}
+            </span>
+          </div>
+
+          <div v-if="gameBonuses(game).length" class="mt-2">
+            <span
+              v-for="bonus in gameBonuses(game)"
+              :key="bonus"
+              class="inline-block px-2 py-0.5 m-0.5 rounded-full bg-navy/10 dark:bg-white/10 text-xs font-semibold whitespace-nowrap"
+            >
+              {{ bonus }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop : tableau -->
+      <div
+        class="hidden md:block rounded-lg shadow-lg overflow-x-auto p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy"
+      >
       <table class="w-full border-collapse">
         <thead>
           <tr class="bg-watergreen dark:bg-navy text-left">
@@ -136,7 +214,8 @@
           </tr>
         </tbody>
       </table>
-    </div>
+      </div>
+    </template>
   </AppShell>
 </template>
 

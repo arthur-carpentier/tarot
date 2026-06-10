@@ -45,8 +45,8 @@
               <td class="p-3">#</td>
               <td class="p-3">Joueur</td>
               <td class="p-3 text-right">Score</td>
-              <td class="p-3 text-right">Participations</td>
-              <td class="p-3 text-right">Victoires</td>
+              <td class="p-3 text-right hidden sm:table-cell">Participations</td>
+              <td class="p-3 text-right hidden sm:table-cell">Victoires</td>
               <td class="p-3 text-right">% victoire</td>
             </tr>
           </thead>
@@ -65,10 +65,10 @@
               >
                 {{ entry.score.toFixed(1) }}
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
                 {{ entry.participations }}
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
                 {{ entry.victoires }}
               </td>
               <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
@@ -135,6 +135,7 @@
         <h2 class="text-2xl font-bold mb-1">Détail par joueur</h2>
         <p class="text-sm text-navy/60 dark:text-periwinkle/80 mb-4">
           Rôles joués et taux de victoire selon le camp.
+          <span class="sm:hidden">Faites défiler le tableau horizontalement.</span>
         </p>
         <div class="overflow-x-auto">
           <table class="w-full border-collapse whitespace-nowrap">
@@ -197,8 +198,8 @@
             <tr class="text-left">
               <td class="p-3">Annonce</td>
               <td class="p-3 text-right">Occurrences</td>
-              <td class="p-3 text-right">% des parties</td>
-              <td class="p-3 text-right">Réussites</td>
+              <td class="p-3 text-right hidden sm:table-cell">% des parties</td>
+              <td class="p-3 text-right hidden sm:table-cell">Réussites</td>
               <td class="p-3 text-right">% réussite</td>
             </tr>
           </thead>
@@ -215,10 +216,10 @@
               <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                 {{ stat.count }}
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
                 {{ percent(stat.count, games.length) }}
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
                 {{ stat.wins }}
               </td>
               <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
