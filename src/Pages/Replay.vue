@@ -179,8 +179,17 @@ const gridColor = computed(() =>
   isDark.value ? "rgba(255, 255, 255, 0.2)" : "rgba(17, 59, 84, 0.15)"
 );
 
-// Course de barres : `realtimeSort` réordonne les joueurs à chaque tick et
-// anime l'échange de positions, `valueAnimation` fait défiler les scores.
+// Classement à la position du curseur, trié par score décroissant. On ne
+// passe pas par `realtimeSort` d'ECharts : il ordonne par longueur de barre
+// (valeur absolue), ce qui plaçait les gros scores négatifs en tête.
+const rankingAtCursor = computed(() =>
+  // Array.sort est stable : à égalité, l'ordre de la feuille est conservé.
+  [...scoresAtCursor.value].sort((a, b) => b.value - a.value)
+);
+
+// Course de barres : l'axe des catégories suit le classement trié, et chaque
+// barre est rattachée à son joueur par son nom (donnée [valeur, nom]) —
+// quand le rang change, la barre glisse vers sa nouvelle ligne.
 const raceOption = computed(() => {
   const ink = inkColor.value;
   return {
@@ -197,7 +206,7 @@ const raceOption = computed(() => {
     },
     yAxis: {
       type: "category",
-      data: activePlayers.value,
+      data: rankingAtCursor.value.map(({ name }) => name),
       inverse: true,
       animationDuration: 300,
       animationDurationUpdate: 300,
@@ -213,21 +222,19 @@ const raceOption = computed(() => {
     series: [
       {
         type: "bar",
-        realtimeSort: true,
         barCategoryGap: "35%",
         data: scoresAtCursor.value.map(({ name, value }) => ({
-          value,
+          value: [value, name],
           itemStyle: { color: playerColor(name), borderRadius: [0, 4, 4, 0] },
         })),
         label: {
           show: true,
           position: "right",
-          valueAnimation: true,
           color: ink,
           fontFamily: "Poppins, sans-serif",
           fontWeight: "bold",
           fontSize: 12,
-          formatter: ({ value }) => Number(value).toFixed(1),
+          formatter: ({ value }) => Number(value[0]).toFixed(1),
         },
       },
     ],
