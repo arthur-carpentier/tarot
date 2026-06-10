@@ -15,12 +15,13 @@ import { playerColor, playerInitials } from "@/services/avatars";
 
 const props = defineProps({
   name: { type: String, required: true },
-  size: { type: String, default: "md" }, // sm | md | lg
+  size: { type: String, default: "md" }, // xs | sm | md | lg
 });
 
 const sizeClass = computed(
   () =>
     ({
+      xs: "w-6 h-6 text-[10px]",
       sm: "w-8 h-8 text-xs",
       md: "w-10 h-10 text-sm",
       lg: "w-12 h-12 text-base",
