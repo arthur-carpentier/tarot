@@ -79,8 +79,9 @@
         </button>
       </div>
 
-      <!-- Marqueur de début de session : écrit le n° de la partie dans
-           Graphiques!R3 pour suivre l'évolution du jour sans gérer de date -->
+      <!-- Marqueur de début de session : écrit le n° de la dernière partie
+           d'avant (base de comparaison) dans Graphiques!R3, avant l'insertion,
+           pour suivre l'évolution du jour sans gérer de date -->
       <label
         class="flex items-center gap-3 bg-watergreen dark:bg-navy rounded-lg shadow p-4 mb-4 cursor-pointer select-none"
         :class="{ 'ring-2 ring-chartreuse': premierePartieDuJour }"

@@ -15,8 +15,9 @@
  */
 
 var SHEET_NAME = "Parties";
-// Cellule de l'onglet "Graphiques" contenant le n° de la première partie
-// de la journée (sert aux évolutions "du jour" dans la feuille et l'app).
+// Cellule de l'onglet "Graphiques" contenant le n° de la DERNIÈRE partie
+// d'avant la journée (base de comparaison, exclue de l'évolution : les
+// formules de la feuille calculent cumul[dernière] - cumul[R3]).
 var GRAPH_SHEET = "Graphiques";
 var TODAY_CELL = "R3";
 
@@ -41,7 +42,7 @@ function doPost(e) {
 
 // Permet de tester que le déploiement répond (ouvrir l'URL dans un navigateur).
 function doGet() {
-  return json_({ ok: true, app: "tarot", sheet: SHEET_NAME, version: 3 });
+  return json_({ ok: true, app: "tarot", sheet: SHEET_NAME, version: 4 });
 }
 
 function addGame_(sheet, data) {
@@ -50,6 +51,18 @@ function addGame_(sheet, data) {
   // Première ligne dont le Preneur (colonne B) est vide
   var row = firstEmptyRow_(sheet);
   if (row === -1) throw new Error('Aucune ligne libre dans l\'onglet "' + SHEET_NAME + '"');
+
+  // Première partie de la journée : AVANT d'insérer, enregistre le n° de la
+  // dernière partie existante (= dernière partie de la session précédente)
+  // dans Graphiques!R3, qui sert de base de comparaison pour l'évolution.
+  var todayBaseline = null;
+  if (data.premierePartieDuJour) {
+    var graphSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(GRAPH_SHEET);
+    if (graphSheet) {
+      todayBaseline = row > 2 ? Number(sheet.getRange(row - 1, 1).getValue()) : 0;
+      graphSheet.getRange(TODAY_CELL).setValue(todayBaseline);
+    }
+  }
 
   var defenseurs = data.defenseurs || [];
 
@@ -79,16 +92,7 @@ function addGame_(sheet, data) {
 
   SpreadsheetApp.flush();
   var result = readBack_(sheet, row);
-
-  // Première partie de la journée : enregistre son numéro dans Graphiques!R3
-  if (data.premierePartieDuJour) {
-    var graphSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(GRAPH_SHEET);
-    if (graphSheet) {
-      graphSheet.getRange(TODAY_CELL).setValue(result.numero);
-      SpreadsheetApp.flush();
-      result.premierePartieDuJour = result.numero;
-    }
-  }
+  if (todayBaseline !== null) result.todayBaseline = todayBaseline;
   return result;
 }
 

@@ -94,10 +94,11 @@ Chart.register(...registerables);
 
 const { games, players, firstGameToday, loading, error } = useTarotData();
 
-// Indice de la première partie de la journée (marqueur Graphiques!R3)
+// Indice de la première partie de la journée : Graphiques!R3 contient la
+// dernière partie d'AVANT la journée, le jour commence donc strictement après.
 const todayStartIndex = computed(() => {
   if (!firstGameToday.value) return null;
-  const index = games.value.findIndex((game) => game.numero >= firstGameToday.value);
+  const index = games.value.findIndex((game) => game.numero > firstGameToday.value);
   return index >= 0 ? index : null;
 });
 const { isDark } = useTheme();

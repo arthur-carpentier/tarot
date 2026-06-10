@@ -189,8 +189,10 @@ export async function fetchSeasonMeta() {
     }
 }
 
-// Onglet "Graphiques" : R3 contient le n° de la première partie de la
-// journée (écrit par le script quand on coche "première partie du jour").
+// Onglet "Graphiques" : R3 contient le n° de la DERNIÈRE partie d'avant la
+// journée (base de comparaison ; les parties du jour sont celles dont le
+// numéro est strictement supérieur). Écrit par le script quand on coche
+// "première partie de la journée".
 export async function fetchTodayMarker() {
     try {
         const table = await fetchGviz("Graphiques", "R3");

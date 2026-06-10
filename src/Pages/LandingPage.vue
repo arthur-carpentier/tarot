@@ -171,9 +171,10 @@ const { games, standings, lastGame, firstGameToday, loading, error } = useTarotD
 
 const textureUrl = `${import.meta.env.BASE_URL}images/card_table_texture.jpg`;
 
+// Graphiques!R3 = dernière partie d'avant la journée → le jour est après
 const todayCount = computed(() =>
   firstGameToday.value
-    ? games.value.filter((game) => game.numero >= firstGameToday.value).length
+    ? games.value.filter((game) => game.numero > firstGameToday.value).length
     : 0
 );
 

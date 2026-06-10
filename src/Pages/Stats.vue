@@ -336,14 +336,14 @@ const percent = (value, total) => (total ? `${((value / total) * 100).toFixed(0)
 
 const duos = computed(() => computeDuoStats(games.value));
 
-// Point de comparaison pour l'évolution du classement : la dernière partie
-// d'avant aujourd'hui si le marqueur Graphiques!R3 est posé et qu'au moins
-// une partie a été jouée depuis, sinon il y a 10 parties.
+// Point de comparaison pour l'évolution du classement : Graphiques!R3
+// contient la dernière partie d'avant aujourd'hui ; on l'utilise si au
+// moins une partie a été jouée depuis, sinon repli sur 10 parties.
 const evolBase = computed(() => {
   const list = games.value;
   if (list.length < 2) return null;
   if (firstGameToday.value) {
-    const index = list.findIndex((game) => game.numero >= firstGameToday.value);
+    const index = list.findIndex((game) => game.numero > firstGameToday.value);
     if (index > 0 && index < list.length) {
       return { game: list[index - 1], label: "depuis le début de la journée" };
     }
