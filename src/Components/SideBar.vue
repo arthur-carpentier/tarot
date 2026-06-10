@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="w-64 bg-watergreen dark:bg-navy p-6 shadow-lg flex-col justify-between h-screen hidden md:flex"
+    class="fixed inset-y-0 left-0 z-20 w-64 bg-watergreen dark:bg-navy p-6 shadow-lg flex-col justify-between overflow-y-auto hidden md:flex"
   >
     <div>
       <router-link to="/">
