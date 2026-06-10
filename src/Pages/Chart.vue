@@ -29,22 +29,59 @@
       Aucune partie enregistrée pour le moment.
     </p>
 
-    <div
-      v-else
-      class="relative p-2 md:p-6 rounded-lg shadow-lg h-[60vh] md:h-[75vh] border border-navy/10 bg-watergreen dark:border-white/10 dark:bg-navy"
-    >
-      <LineChart
-        :key="isDark"
-        :options="chartOptions"
-        :chartData="chartDataFormatted"
-        class="h-full"
-      />
-    </div>
+    <template v-else>
+      <!-- Filtres : joueurs, fenêtre de parties -->
+      <div class="flex flex-wrap gap-2 mb-4 items-center">
+        <button
+          v-for="name in activePlayers"
+          :key="name"
+          @click="togglePlayer(name)"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium ring-1 ring-navy/20 dark:ring-white/20 transition"
+          :class="
+            hiddenPlayers.includes(name)
+              ? 'opacity-40 line-through bg-white dark:bg-white/5'
+              : 'bg-white dark:bg-white/10'
+          "
+        >
+          <span
+            class="w-2.5 h-2.5 rounded-full shrink-0"
+            :style="{ backgroundColor: playerColor(name) }"
+          ></span>
+          {{ name }}
+        </button>
+        <span class="mx-1 hidden md:inline text-navy/30 dark:text-white/30">|</span>
+        <select v-model="windowSize" class="filter-select">
+          <option value="all">Toutes les parties</option>
+          <option value="50">50 dernières</option>
+          <option value="20">20 dernières</option>
+          <option value="10">10 dernières</option>
+        </select>
+        <label class="flex items-center gap-1.5 text-sm cursor-pointer select-none">
+          <input
+            type="checkbox"
+            v-model="zeroStart"
+            class="rounded border-navy/30 text-pine focus:ring-pine"
+          />
+          départ à zéro
+        </label>
+      </div>
+
+      <div
+        class="relative p-2 md:p-6 rounded-lg shadow-lg h-[60vh] md:h-[72vh] border border-navy/10 bg-watergreen dark:border-white/10 dark:bg-navy"
+      >
+        <LineChart
+          :key="isDark"
+          :options="chartOptions"
+          :chartData="chartDataFormatted"
+          class="h-full"
+        />
+      </div>
+    </template>
   </AppShell>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import AppShell from "@/Components/AppShell.vue";
 import { LineChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
@@ -57,29 +94,52 @@ Chart.register(...registerables);
 const { games, players, loading, error } = useTarotData();
 const { isDark } = useTheme();
 
-// Un dataset par joueur ayant participé à au moins une partie ;
-// le cumul (colonnes BE.. de la feuille) est défini pour chaque manche.
+const windowSize = ref("all");
+const zeroStart = ref(false);
+const hiddenPlayers = ref([]);
+
+const togglePlayer = (name) => {
+  hiddenPlayers.value = hiddenPlayers.value.includes(name)
+    ? hiddenPlayers.value.filter((n) => n !== name)
+    : [...hiddenPlayers.value, name];
+};
+
+const activePlayers = computed(() =>
+  players.value.filter((name) =>
+    games.value.some((game) => game.scores[name] !== undefined)
+  )
+);
+
+// Un dataset par joueur affiché ; le cumul (colonnes BE.. de la feuille)
+// est défini pour chaque manche. La fenêtre limite aux N dernières parties,
+// "départ à zéro" rebase chaque joueur sur son cumul d'avant la fenêtre.
 const chartDataFormatted = computed(() => {
   if (games.value.length === 0) return { labels: [], datasets: [] };
 
-  const labels = games.value.map((game) => `Partie ${game.numero}`);
-  const activePlayers = players.value.filter((name) =>
-    games.value.some((game) => game.scores[name] !== undefined)
-  );
+  const all = games.value;
+  const start = windowSize.value === "all" ? 0 : Math.max(0, all.length - Number(windowSize.value));
+  const window = all.slice(start);
+  const previous = start > 0 ? all[start - 1] : null;
 
   return {
-    labels,
-    datasets: activePlayers.map((name) => ({
-      label: name,
-      borderColor: playerColor(name),
-      backgroundColor: playerColor(name) + "20",
-      pointBorderColor: "#00000000",
-      pointBackgroundColor: "#00000000",
-      data: games.value.map((game) => game.cumulativeScores[name] ?? 0),
-      fill: false,
-      tension: 0.2,
-      playerName: name,
-    })),
+    labels: window.map((game) => `Partie ${game.numero}`),
+    datasets: activePlayers.value
+      .filter((name) => !hiddenPlayers.value.includes(name))
+      .map((name) => {
+        const baseline =
+          zeroStart.value && previous ? previous.cumulativeScores[name] ?? 0 : 0;
+        return {
+          label: name,
+          borderColor: playerColor(name),
+          backgroundColor: playerColor(name) + "20",
+          pointBorderColor: "#00000000",
+          pointBackgroundColor: "#00000000",
+          data: window.map((game) => (game.cumulativeScores[name] ?? 0) - baseline),
+          fill: false,
+          tension: 0.2,
+          playerName: name,
+        };
+      }),
   };
 });
 
@@ -107,17 +167,8 @@ const chartOptions = computed(() => {
       },
     },
     plugins: {
-      legend: {
-        display: true,
-        labels: {
-          color: ink,
-          boxWidth: narrow ? 20 : 40,
-          font: {
-            family: "'Poppins', sans-serif",
-            size: narrow ? 11 : 14,
-          },
-        },
-      },
+      // la légende est remplacée par les puces de filtre au-dessus du graphique
+      legend: { display: false },
       tooltip: {
         enabled: true,
         mode: "index",

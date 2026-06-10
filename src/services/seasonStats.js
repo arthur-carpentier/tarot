@@ -5,7 +5,7 @@
 // être pris en compte dans les titres en pourcentage.
 export const MIN_PARTIES = 15;
 
-function aggregatePlayers(games, players) {
+export function aggregatePlayers(games, players) {
     const stats = new Map(
         players.map((name) => [
             name,

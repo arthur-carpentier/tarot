@@ -36,13 +36,15 @@
         </div>
       </div>
 
+      <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 items-start">
       <!-- Classement -->
-      <div class="rounded-lg shadow-lg overflow-x-auto p-4 md:p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy">
+      <div class="xl:col-span-3 rounded-lg shadow-lg overflow-x-auto p-4 md:p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy">
         <h2 class="text-2xl font-bold mb-4">Classement</h2>
         <table class="w-full border-collapse">
           <thead>
             <tr class="text-left">
               <td class="p-3">#</td>
+              <td class="p-3"></td>
               <td class="p-3">Joueur</td>
               <td class="p-3 text-right">Score</td>
               <td class="p-3 text-right hidden sm:table-cell">Participations</td>
@@ -51,8 +53,27 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(entry, index) in rankedStandings" :key="entry.name">
+            <tr
+              v-for="(entry, index) in rankedStandings"
+              :key="entry.name"
+              class="cursor-pointer"
+              @click="$router.push(`/player/${encodeURIComponent(entry.name)}`)"
+            >
               <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">{{ index + 1 }}</td>
+              <!-- Évolution du classement sur les 10 dernières parties -->
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-center">
+                <span
+                  v-if="rankEvolution[entry.name] > 0"
+                  class="text-pine dark:text-chartreuse font-bold"
+                  :title="`+${rankEvolution[entry.name]} place(s) sur les 10 dernières parties`"
+                >▲{{ rankEvolution[entry.name] }}</span>
+                <span
+                  v-else-if="rankEvolution[entry.name] < 0"
+                  class="text-red-600 dark:text-red-400 font-bold"
+                  :title="`${rankEvolution[entry.name]} place(s) sur les 10 dernières parties`"
+                >▼{{ -rankEvolution[entry.name] }}</span>
+                <span v-else class="text-navy/40 dark:text-periwinkle/50">=</span>
+              </td>
               <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
                 <div class="flex items-center space-x-3">
                   <PlayerAvatar :name="entry.name" size="sm" />
@@ -77,6 +98,101 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Stats par annonce -->
+      <div class="xl:col-span-2 rounded-lg shadow-lg overflow-x-auto p-4 md:p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy">
+        <h2 class="text-2xl font-bold mb-4">Annonces</h2>
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="text-left">
+              <td class="p-3">Annonce</td>
+              <td class="p-3 text-right">Occurrences</td>
+              <td class="p-3 text-right hidden sm:table-cell">% des parties</td>
+              <td class="p-3 text-right hidden sm:table-cell">Réussites</td>
+              <td class="p-3 text-right">% réussite</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="stat in annonceStats" :key="stat.name">
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
+                <span
+                  class="px-2 py-0.5 rounded ring-1 ring-navy/20 dark:ring-white/30 text-sm font-semibold"
+                  :style="annonceStyle(stat.name)"
+                >
+                  {{ stat.name }}
+                </span>
+              </td>
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+                {{ stat.count }}
+              </td>
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
+                {{ percent(stat.count, games.length) }}
+              </td>
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
+                {{ stat.wins }}
+              </td>
+              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+                {{ stat.count ? percent(stat.wins, stat.count) : "—" }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+      <!-- Duos preneur → appelé -->
+      <div class="rounded-lg shadow-lg p-4 md:p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy">
+        <h2 class="text-2xl font-bold mb-1">Duos</h2>
+        <p class="text-sm text-navy/60 dark:text-periwinkle/80 mb-4">
+          Preneur → appelé. Taux de réussite du contrat quand ils attaquent ensemble
+          (minimum {{ MIN_DUO_GAMES }} parties pour les classements).
+          <template v-if="duos.selfCalls">
+            {{ duos.selfCalls }} auto-appel{{ duos.selfCalls > 1 ? "s" : "" }} au total.
+          </template>
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <h3 class="font-bold mb-2 text-navy/60 dark:text-periwinkle/80">Les plus fréquents</h3>
+            <ul class="space-y-2">
+              <li v-for="duo in duos.frequent" :key="duo.preneur + duo.appele" class="flex items-center gap-2">
+                <PlayerAvatar :name="duo.preneur" size="xs" />
+                <i class="fa-solid fa-arrow-right text-xs text-navy/40 dark:text-periwinkle/50"></i>
+                <PlayerAvatar :name="duo.appele" size="xs" />
+                <span class="text-sm flex-1 truncate">{{ duo.preneur }} → {{ duo.appele }}</span>
+                <span class="text-sm font-bold whitespace-nowrap">{{ duo.count }}×</span>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold mb-2 text-pine dark:text-chartreuse">Les plus efficaces</h3>
+            <ul class="space-y-2">
+              <li v-for="duo in duos.best" :key="duo.preneur + duo.appele" class="flex items-center gap-2">
+                <PlayerAvatar :name="duo.preneur" size="xs" />
+                <i class="fa-solid fa-arrow-right text-xs text-navy/40 dark:text-periwinkle/50"></i>
+                <PlayerAvatar :name="duo.appele" size="xs" />
+                <span class="text-sm flex-1 truncate">{{ duo.preneur }} → {{ duo.appele }}</span>
+                <span class="text-sm font-bold text-pine dark:text-chartreuse whitespace-nowrap">
+                  {{ percent(duo.wins, duo.count) }} ({{ duo.count }}×)
+                </span>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold mb-2 text-red-600 dark:text-red-400">Les moins efficaces</h3>
+            <ul class="space-y-2">
+              <li v-for="duo in duos.worst" :key="duo.preneur + duo.appele" class="flex items-center gap-2">
+                <PlayerAvatar :name="duo.preneur" size="xs" />
+                <i class="fa-solid fa-arrow-right text-xs text-navy/40 dark:text-periwinkle/50"></i>
+                <PlayerAvatar :name="duo.appele" size="xs" />
+                <span class="text-sm flex-1 truncate">{{ duo.preneur }} → {{ duo.appele }}</span>
+                <span class="text-sm font-bold text-red-600 dark:text-red-400 whitespace-nowrap">
+                  {{ percent(duo.wins, duo.count) }} ({{ duo.count }}×)
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <!-- Records : plus gros gains / plus grosses pertes sur une manche -->
@@ -190,45 +306,6 @@
         </div>
       </div>
 
-      <!-- Stats par annonce -->
-      <div class="rounded-lg shadow-lg overflow-x-auto p-4 md:p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy">
-        <h2 class="text-2xl font-bold mb-4">Annonces</h2>
-        <table class="w-full border-collapse">
-          <thead>
-            <tr class="text-left">
-              <td class="p-3">Annonce</td>
-              <td class="p-3 text-right">Occurrences</td>
-              <td class="p-3 text-right hidden sm:table-cell">% des parties</td>
-              <td class="p-3 text-right hidden sm:table-cell">Réussites</td>
-              <td class="p-3 text-right">% réussite</td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="stat in annonceStats" :key="stat.name">
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
-                <span
-                  class="px-2 py-0.5 rounded ring-1 ring-navy/20 dark:ring-white/30 text-sm font-semibold"
-                  :style="annonceStyle(stat.name)"
-                >
-                  {{ stat.name }}
-                </span>
-              </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
-                {{ stat.count }}
-              </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
-                {{ percent(stat.count, games.length) }}
-              </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
-                {{ stat.wins }}
-              </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
-                {{ stat.count ? percent(stat.wins, stat.count) : "—" }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   </AppShell>
 </template>
@@ -239,10 +316,30 @@ import AppShell from "@/Components/AppShell.vue";
 import PlayerAvatar from "@/Components/PlayerAvatar.vue";
 import { useTarotData } from "@/composables/useTarotData";
 import { annonceStyle } from "@/services/avatars";
+import { computeDuoStats, MIN_DUO_GAMES } from "@/services/duoStats";
 
 const { games, annonces, players, standings, loading, error } = useTarotData();
 
 const percent = (value, total) => (total ? `${((value / total) * 100).toFixed(0)}%` : "—");
+
+const duos = computed(() => computeDuoStats(games.value));
+
+// Évolution du classement par rapport à il y a 10 parties (comme l'onglet
+// Graphiques de la feuille) : positif = a gagné des places.
+const rankEvolution = computed(() => {
+  const list = games.value;
+  if (list.length < 2) return {};
+  const rankAt = (game) =>
+    players.value
+      .map((name) => ({ name, score: game.cumulativeScores[name] ?? 0 }))
+      .sort((a, b) => b.score - a.score)
+      .reduce((acc, entry, index) => ((acc[entry.name] = index + 1), acc), {});
+  const now = rankAt(list[list.length - 1]);
+  const before = rankAt(list[Math.max(0, list.length - 1 - 10)]);
+  const evolution = {};
+  for (const name of players.value) evolution[name] = before[name] - now[name];
+  return evolution;
+});
 
 const attaqueWins = computed(() => games.value.filter((game) => game.fait).length);
 

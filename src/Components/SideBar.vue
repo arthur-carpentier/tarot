@@ -60,6 +60,16 @@
           </li>
           <li>
             <button
+              @click="refresh"
+              :disabled="refreshing"
+              class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-periwinkle/40 dark:hover:bg-white/10 transition text-navy/60 dark:text-periwinkle/80"
+            >
+              <RefreshIcon class="w-6 h-6" :class="{ 'animate-spin': refreshing }" />
+              <span>{{ refreshing ? "Mise à jour…" : "Rafraîchir" }}</span>
+            </button>
+          </li>
+          <li>
+            <button
               @click="toggle"
               class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-periwinkle/40 dark:hover:bg-white/10 transition text-navy/60 dark:text-periwinkle/80"
             >
@@ -80,6 +90,14 @@
     <div class="flex items-center justify-between px-4 py-3">
       <router-link to="/" class="text-2xl font-bold font-display">Tarot</router-link>
       <div class="flex items-center space-x-2">
+        <button
+          @click="refresh"
+          :disabled="refreshing"
+          class="p-2 rounded-lg hover:bg-periwinkle/40 dark:hover:bg-white/10 transition"
+          title="Rafraîchir les données"
+        >
+          <RefreshIcon class="w-5 h-5" :class="{ 'animate-spin': refreshing }" />
+        </button>
         <button
           @click="toggle"
           class="p-2 rounded-lg hover:bg-periwinkle/40 dark:hover:bg-white/10 transition"
@@ -123,12 +141,15 @@ import {
   SunIcon,
   MoonIcon,
   StarIcon,
+  RefreshIcon,
 } from "@heroicons/vue/outline";
 import { SHEET_URL } from "@/config";
 import { useTheme } from "@/composables/useTheme";
+import { useTarotData } from "@/composables/useTarotData";
 
 const sheetUrl = SHEET_URL;
 const { isDark, toggle } = useTheme();
+const { refreshing, refresh } = useTarotData();
 
 const centeredMenuItems = [
   { title: "Parties", link: "/games", icon: ViewListIcon },

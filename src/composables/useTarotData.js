@@ -4,12 +4,17 @@ import { registerPlayers } from "@/services/avatars";
 
 // Store partagé entre les pages : la feuille n'est chargée qu'une fois,
 // refresh() force un rechargement (après l'ajout d'une partie).
+// Un cache localStorage permet d'afficher immédiatement les données de la
+// dernière visite pendant que la feuille est rechargée en arrière-plan.
+const CACHE_KEY = "tarot.cache.v1";
+
 const players = ref([]);
 const annonces = ref([]);
 const poignees = ref([]);
 const bonuses = ref([]);
 const games = ref([]);
-const loading = ref(false);
+const loading = ref(false); // aucune donnée à afficher pour l'instant
+const refreshing = ref(false); // rechargement (éventuellement en arrière-plan)
 const error = ref(null);
 // Étapes du chargement initial, affichées par l'écran de démarrage
 const loadingSteps = ref([]);
@@ -17,9 +22,47 @@ const loadingSteps = ref([]);
 let loadedOnce = false;
 const initialLoadDone = ref(false);
 
+function applyData(data) {
+    players.value = data.players;
+    registerPlayers(data.players);
+    annonces.value = data.annonces;
+    poignees.value = data.poignees;
+    bonuses.value = data.bonuses;
+    games.value = data.games;
+    loadedOnce = true;
+}
+
+function readCache() {
+    try {
+        const data = JSON.parse(localStorage.getItem(CACHE_KEY));
+        return data?.players?.length && data?.games ? data : null;
+    } catch {
+        return null;
+    }
+}
+
+function writeCache(data) {
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+    } catch {
+        // stockage plein ou indisponible : tant pis pour le cache
+    }
+}
+
 async function load() {
-    loading.value = true;
+    if (refreshing.value) return;
     error.value = null;
+
+    if (!loadedOnce) {
+        const cached = readCache();
+        if (cached) {
+            applyData(cached);
+            initialLoadDone.value = true;
+        }
+    }
+
+    loading.value = !loadedOnce;
+    refreshing.value = true;
     loadingSteps.value = [
         { label: "Connexion au Google Sheet", done: false },
         { label: "Joueurs et règles (onglet « Données »)", done: false },
@@ -39,23 +82,27 @@ async function load() {
             return parties;
         });
         const [rules, parties] = await Promise.all([rulesPromise, gamesPromise]);
-        players.value = rules.players;
-        registerPlayers(rules.players);
-        annonces.value = rules.annonces;
-        poignees.value = rules.poignees;
-        bonuses.value = rules.bonuses;
-        games.value = parties.games;
-        loadedOnce = true;
+        const data = {
+            players: rules.players,
+            annonces: rules.annonces,
+            poignees: rules.poignees,
+            bonuses: rules.bonuses,
+            games: parties.games,
+        };
+        applyData(data);
+        writeCache(data);
     } catch (e) {
-        error.value = e.message || String(e);
+        // Si on affiche déjà des données (du cache), on ne bloque pas l'UI
+        if (!loadedOnce) error.value = e.message || String(e);
     } finally {
         loading.value = false;
+        refreshing.value = false;
         initialLoadDone.value = true;
     }
 }
 
 export function useTarotData() {
-    if (!loadedOnce && !loading.value) load();
+    if (!loadedOnce && !refreshing.value) load();
 
     const lastGame = computed(() => games.value[games.value.length - 1] || null);
 
@@ -88,6 +135,7 @@ export function useTarotData() {
         bonuses,
         games,
         loading,
+        refreshing,
         error,
         loadingSteps,
         initialLoadDone,

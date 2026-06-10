@@ -1,7 +1,9 @@
 <template>
   <AppShell>
-    <div class="max-w-2xl mx-auto pb-36">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">Nouvelle partie</h1>
+    <div class="max-w-2xl lg:max-w-5xl mx-auto pb-36 lg:pb-10">
+      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center lg:text-left">
+        Nouvelle partie
+      </h1>
 
       <!-- Configuration du script d'écriture -->
       <div
@@ -33,6 +35,51 @@
         </div>
       </div>
 
+      <!-- Scores réels après enregistrement -->
+      <div
+        v-if="lastResult"
+        class="bg-watergreen dark:bg-navy rounded-lg shadow p-4 mb-6 border-2 border-chartreuse"
+      >
+        <h2 class="text-lg font-semibold">
+          ✅ Partie n°{{ lastResult.numero }} enregistrée
+        </h2>
+        <p
+          v-if="lastResult.prisChuteDe !== undefined"
+          class="text-sm font-semibold mb-2"
+          :class="lastResult.fait ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
+        >
+          {{ lastResult.fait ? "Contrat fait" : "Contrat chuté" }}
+          ({{ (lastResult.prisChuteDe >= 0 ? "+" : "") + Number(lastResult.prisChuteDe).toFixed(1) }})
+        </p>
+        <ul v-if="lastResult.scoreEntries.length" class="space-y-1.5 mt-2">
+          <li
+            v-for="entry in lastResult.scoreEntries"
+            :key="entry.name"
+            class="flex items-center gap-2 text-sm"
+          >
+            <PlayerAvatar :name="entry.name" size="xs" />
+            <span class="flex-1">{{ entry.name }}</span>
+            <span
+              class="font-bold"
+              :class="entry.points >= 0 ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
+            >
+              {{ (entry.points >= 0 ? "+" : "") + entry.points.toFixed(1) }} pts
+            </span>
+          </li>
+        </ul>
+        <p v-else class="text-sm text-navy/60 dark:text-periwinkle/80">
+          Scores calculés par la feuille (mettez à jour le script Apps Script pour les
+          voir ici directement).
+        </p>
+        <button
+          @click="lastResult = null"
+          class="mt-3 text-sm underline text-navy/60 dark:text-periwinkle/80"
+        >
+          Fermer
+        </button>
+      </div>
+
+      <div class="lg:grid lg:grid-cols-[1fr,21rem] lg:gap-6 lg:items-start">
       <form @submit.prevent="submitGame" class="space-y-4">
         <!-- 1. Annonce -->
         <section class="bg-watergreen dark:bg-navy rounded-lg shadow p-4 relative">
@@ -271,8 +318,11 @@
           </div>
         </section>
 
-        <!-- Prévisualisation des points -->
-        <section v-if="preview" class="bg-watergreen dark:bg-navy rounded-lg shadow p-4">
+        <!-- Prévisualisation des points (mobile : dans le flux du formulaire) -->
+        <section
+          v-if="preview"
+          class="lg:hidden bg-watergreen dark:bg-navy rounded-lg shadow p-4"
+        >
           <h2 class="text-lg font-semibold mb-1">Prévisualisation</h2>
           <p
             class="text-sm mb-3 font-semibold"
@@ -300,18 +350,78 @@
           </ul>
         </section>
 
-        <p v-if="submitError" class="text-red-600 dark:text-red-400 font-semibold text-center">
+        <p
+          v-if="submitError"
+          class="text-red-600 dark:text-red-400 font-semibold text-center"
+        >
           {{ submitError }}
         </p>
-        <p v-if="submitSuccess" class="text-pine dark:text-chartreuse font-semibold text-center">
-          Partie n°{{ submitSuccess }} enregistrée dans le Google Sheet !
-        </p>
       </form>
+
+      <!-- Desktop : récapitulatif collant à droite -->
+      <aside class="hidden lg:block sticky top-6 space-y-4">
+        <div class="bg-watergreen dark:bg-navy rounded-lg shadow p-4">
+          <h2 class="text-lg font-semibold mb-2">Récapitulatif</h2>
+          <template v-if="missing.length">
+            <p class="text-sm text-navy/60 dark:text-periwinkle/80">
+              Reste à choisir : {{ missing.join(", ") }}.
+            </p>
+          </template>
+          <template v-else-if="preview">
+            <p
+              class="text-sm mb-3 font-semibold"
+              :class="preview.fait ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
+            >
+              {{ preview.fait ? "Contrat fait" : "Contrat chuté" }} de
+              {{ Math.abs(preview.pointsAttaque - preview.pointsAFaire).toFixed(1) }}
+              ({{ preview.pointsAttaque.toFixed(1) }} / {{ preview.pointsAFaire }})
+            </p>
+            <ul class="space-y-2">
+              <li
+                v-for="entry in preview.entries"
+                :key="entry.name"
+                class="flex items-center gap-3"
+              >
+                <PlayerAvatar
+                  :name="entry.name"
+                  size="sm"
+                  :class="`outline outline-2 ${entry.outline}`"
+                />
+                <span class="flex-1">{{ entry.name }}</span>
+                <span
+                  class="font-bold"
+                  :class="entry.points >= 0 ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
+                >
+                  {{ (entry.points >= 0 ? "+" : "") + entry.points.toFixed(1) }} pts
+                </span>
+              </li>
+            </ul>
+          </template>
+          <button
+            @click="submitGame"
+            class="mt-4 w-full bg-chartreuse text-navy px-6 py-2.5 rounded-lg font-bold hover:brightness-95 transition"
+            :class="{
+              '!bg-navy/20 !text-navy/40 dark:!bg-white/10 dark:!text-white/40 cursor-not-allowed':
+                isDisabled || submitting,
+            }"
+            :disabled="isDisabled || submitting"
+          >
+            {{ submitting ? "Enregistrement…" : "Ajouter la partie" }}
+          </button>
+          <p
+            v-if="submitError"
+            class="text-red-600 dark:text-red-400 font-semibold text-sm mt-2"
+          >
+            {{ submitError }}
+          </p>
+        </div>
+      </aside>
+      </div>
     </div>
 
-    <!-- Barre d'action collée en bas -->
+    <!-- Mobile : barre d'action collée en bas -->
     <div
-      class="fixed bottom-0 inset-x-0 md:left-64 z-40 bg-white/95 dark:bg-navy-deep/95 backdrop-blur border-t border-navy/10 dark:border-white/10 px-4 py-3"
+      class="lg:hidden fixed bottom-0 inset-x-0 md:left-64 z-40 bg-white/95 dark:bg-navy-deep/95 backdrop-blur border-t border-navy/10 dark:border-white/10 px-4 py-3"
     >
       <div class="max-w-2xl mx-auto flex items-center gap-3">
         <p class="flex-1 text-sm min-w-0 truncate">
@@ -371,7 +481,8 @@ const points = ref(41);
 const pour = ref(null);
 const submitting = ref(false);
 const submitError = ref(null);
-const submitSuccess = ref(null);
+// Résultat du dernier ajout, avec les scores réellement calculés par la feuille
+const lastResult = ref(null);
 
 const showConfig = ref(false);
 const scriptUrl = ref(getAppsScriptUrl());
@@ -556,7 +667,7 @@ const saveScriptUrl = () => {
 const submitGame = async () => {
   if (isDisabled.value || submitting.value) return;
   submitError.value = null;
-  submitSuccess.value = null;
+  lastResult.value = null;
   submitting.value = true;
   try {
     const result = await appendGame({
@@ -574,7 +685,14 @@ const submitGame = async () => {
       doublePoignee: toggles.doublePoignee,
       triplePoignee: toggles.triplePoignee,
     });
-    submitSuccess.value = result.numero || "?";
+    lastResult.value = {
+      numero: result.numero || "?",
+      fait: result.fait,
+      prisChuteDe: result.prisChuteDe,
+      scoreEntries: Object.entries(result.scores || {})
+        .map(([name, points]) => ({ name, points }))
+        .sort((a, b) => b.points - a.points),
+    };
     // Réinitialise le formulaire et recharge les données de la feuille
     preneur.value = null;
     appele.value = null;

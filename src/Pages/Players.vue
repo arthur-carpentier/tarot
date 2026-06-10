@@ -28,10 +28,11 @@
     <p v-else-if="error" class="text-center text-red-600 dark:text-red-400 text-lg">{{ error }}</p>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div
+      <router-link
         v-for="entry in standings"
         :key="entry.name"
-        class="rounded-lg p-4 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy flex items-center space-x-4"
+        :to="`/player/${encodeURIComponent(entry.name)}`"
+        class="rounded-lg p-4 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy flex items-center space-x-4 hover:ring-2 hover:ring-chartreuse transition"
       >
         <PlayerAvatar :name="entry.name" size="lg" />
         <div class="flex-1 min-w-0">
@@ -47,7 +48,7 @@
         >
           {{ entry.score.toFixed(1) }}
         </div>
-      </div>
+      </router-link>
     </div>
   </AppShell>
 </template>

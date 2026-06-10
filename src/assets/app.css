@@ -24,6 +24,12 @@
     }
 }
 
+@layer components {
+    .filter-select {
+        @apply rounded-lg border-navy/20 bg-white text-navy text-sm py-1.5 pl-3 pr-8 dark:bg-navy dark:border-white/20 dark:text-white;
+    }
+}
+
 thead tr {
     @apply text-navy/60 dark:text-periwinkle/80;
 }

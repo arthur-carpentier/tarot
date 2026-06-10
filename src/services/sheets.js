@@ -189,28 +189,36 @@ export async function fetchSeasonMeta() {
     }
 }
 
-// Ajout d'une partie via le script Apps Script déployé en Web App.
+// Appel du script Apps Script déployé en Web App.
 // Le body est envoyé en text/plain pour éviter le preflight CORS
 // (Apps Script ne répond pas aux requêtes OPTIONS).
-export async function appendGame(game) {
+async function callAppsScript(payload) {
     const url = getAppsScriptUrl();
     if (!url) {
         throw new Error(
             "L'URL du script Google Apps Script n'est pas configurée. " +
-                "Renseignez-la dans le panneau de configuration de cette page."
+                "Renseignez-la dans le panneau de configuration de la page Nouvelle partie."
         );
     }
     const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(game),
+        body: JSON.stringify(payload),
     });
     if (!response.ok) {
         throw new Error(`Le script a répondu ${response.status}`);
     }
     const result = await response.json();
     if (!result.ok) {
-        throw new Error(result.error || "Le script a refusé l'ajout");
+        throw new Error(result.error || "Le script a refusé l'opération");
     }
     return result;
+}
+
+export function appendGame(game) {
+    return callAppsScript({ action: "add", ...game });
+}
+
+export function deleteLastGame() {
+    return callAppsScript({ action: "deleteLast" });
 }
