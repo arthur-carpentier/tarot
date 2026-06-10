@@ -37,7 +37,7 @@
 
       <!-- Évolution personnelle -->
       <div class="rounded-lg shadow-lg p-2 md:p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy h-[40vh]">
-        <LineChart :key="isDark" :options="chartOptions" :chartData="chartData" class="h-full" />
+        <VChart :option="chartOption" :update-options="{ notMerge: true }" autoresize class="h-full w-full" />
       </div>
 
       <!-- Rôles et taux de victoire -->
@@ -187,14 +187,11 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import AppShell from "@/Components/AppShell.vue";
 import PlayerAvatar from "@/Components/PlayerAvatar.vue";
-import { LineChart } from "vue-chart-3";
-import { Chart, registerables } from "chart.js";
+import { VChart } from "@/services/echarts";
 import { useTarotData } from "@/composables/useTarotData";
 import { useTheme } from "@/composables/useTheme";
 import { aggregatePlayers } from "@/services/seasonStats";
 import { playerColor, annonceStyle } from "@/services/avatars";
-
-Chart.register(...registerables);
 
 const route = useRoute();
 const { games, players, annonces, standings, loading, error } = useTarotData();
@@ -274,43 +271,53 @@ const lastGames = computed(() =>
     }))
 );
 
-const chartData = computed(() => ({
-  labels: games.value.map((g) => `Partie ${g.numero}`),
-  datasets: [
-    {
-      label: name.value,
-      borderColor: playerColor(name.value),
-      backgroundColor: playerColor(name.value) + "30",
-      pointBackgroundColor: "#00000000",
-      pointBorderColor: "#00000000",
-      data: games.value.map((g) => g.cumulativeScores[name.value] ?? 0),
-      fill: true,
-      tension: 0.2,
-    },
-  ],
-}));
-
-const chartOptions = computed(() => {
+const chartOption = computed(() => {
   const ink = isDark.value ? "#FFFFFF" : "#113B54";
   const grid = isDark.value ? "rgba(255, 255, 255, 0.2)" : "rgba(17, 59, 84, 0.15)";
+  const color = playerColor(name.value);
   return {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: 200,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        mode: "index",
-        intersect: false,
-        callbacks: {
-          label: (item) => `${item.raw.toFixed(1)} points`,
-        },
+    animationDuration: 200,
+    grid: { left: 8, right: 16, top: 16, bottom: 8, containLabel: true },
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: isDark.value
+        ? "rgba(10, 36, 52, 0.95)"
+        : "rgba(255, 255, 255, 0.95)",
+      borderColor: isDark.value ? "rgba(255,255,255,0.15)" : "rgba(17,59,84,0.15)",
+      borderWidth: 1,
+      textStyle: { color: ink, fontFamily: "Poppins, sans-serif" },
+      extraCssText: "border-radius:8px;",
+      axisPointer: { type: "line", lineStyle: { color: grid } },
+      valueFormatter: (value) => `${Number(value ?? 0).toFixed(1)} points`,
+    },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: games.value.map((g) => `Partie ${g.numero}`),
+      axisLine: { lineStyle: { color: grid } },
+      axisTick: { show: false },
+      axisLabel: { color: ink, fontFamily: "Poppins, sans-serif", fontSize: 10 },
+      splitLine: { show: false },
+    },
+    yAxis: {
+      type: "value",
+      axisLine: { show: false },
+      axisLabel: { color: ink, fontFamily: "Poppins, sans-serif", fontSize: 10 },
+      splitLine: { lineStyle: { color: grid } },
+    },
+    series: [
+      {
+        name: name.value,
+        type: "line",
+        smooth: true,
+        showSymbol: false,
+        symbolSize: 6,
+        lineStyle: { width: 2, color },
+        itemStyle: { color },
+        areaStyle: { color, opacity: 0.18 },
+        data: games.value.map((g) => g.cumulativeScores[name.value] ?? 0),
       },
-    },
-    scales: {
-      x: { grid: { color: grid }, ticks: { color: ink, font: { size: 10 } } },
-      y: { grid: { color: grid }, ticks: { color: ink, font: { size: 10 } } },
-    },
+    ],
   };
 });
 </script>
