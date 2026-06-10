@@ -11,14 +11,34 @@ const bonuses = ref([]);
 const games = ref([]);
 const loading = ref(false);
 const error = ref(null);
+// Étapes du chargement initial, affichées par l'écran de démarrage
+const loadingSteps = ref([]);
 
 let loadedOnce = false;
+const initialLoadDone = ref(false);
 
 async function load() {
     loading.value = true;
     error.value = null;
+    loadingSteps.value = [
+        { label: "Connexion au Google Sheet", done: false },
+        { label: "Joueurs et règles (onglet « Données »)", done: false },
+        { label: "Parties et scores (onglet « Parties »)", done: false },
+    ];
     try {
-        const [rules, parties] = await Promise.all([fetchRules(), fetchGames()]);
+        const rulesPromise = fetchRules().then((rules) => {
+            loadingSteps.value[0].done = true;
+            loadingSteps.value[1].done = true;
+            loadingSteps.value[1].label = `${rules.players.length} joueurs, ${rules.annonces.length} annonces`;
+            return rules;
+        });
+        const gamesPromise = fetchGames().then((parties) => {
+            loadingSteps.value[0].done = true;
+            loadingSteps.value[2].done = true;
+            loadingSteps.value[2].label = `${parties.games.length} parties chargées`;
+            return parties;
+        });
+        const [rules, parties] = await Promise.all([rulesPromise, gamesPromise]);
         players.value = rules.players;
         registerPlayers(rules.players);
         annonces.value = rules.annonces;
@@ -30,6 +50,7 @@ async function load() {
         error.value = e.message || String(e);
     } finally {
         loading.value = false;
+        initialLoadDone.value = true;
     }
 }
 
@@ -68,6 +89,8 @@ export function useTarotData() {
         games,
         loading,
         error,
+        loadingSteps,
+        initialLoadDone,
         lastGame,
         standings,
         refresh: load,
