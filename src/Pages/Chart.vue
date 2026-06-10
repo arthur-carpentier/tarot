@@ -70,11 +70,11 @@
       <div
         class="relative p-2 md:p-6 rounded-lg shadow-lg h-[60vh] md:h-[72vh] border border-navy/10 bg-watergreen dark:border-white/10 dark:bg-navy"
       >
-        <LineChart
-          :key="isDark"
-          :options="chartOptions"
-          :chartData="chartDataFormatted"
-          class="h-full"
+        <VChart
+          :option="chartOption"
+          :update-options="{ notMerge: true }"
+          autoresize
+          class="h-full w-full"
         />
       </div>
     </template>
@@ -84,13 +84,10 @@
 <script setup>
 import { ref, computed } from "vue";
 import AppShell from "@/Components/AppShell.vue";
-import { LineChart } from "vue-chart-3";
-import { Chart, registerables } from "chart.js";
+import { VChart } from "@/services/echarts";
 import { useTarotData } from "@/composables/useTarotData";
 import { useTheme } from "@/composables/useTheme";
 import { playerColor, playerInitials } from "@/services/avatars";
-
-Chart.register(...registerables);
 
 const { games, players, firstGameToday, loading, error } = useTarotData();
 
@@ -119,11 +116,21 @@ const activePlayers = computed(() =>
   )
 );
 
-// Un dataset par joueur affiché ; le cumul (colonnes BE.. de la feuille)
+// Sur mobile : marges réduites, polices plus petites, avatars compacts
+const isNarrow = () => typeof window !== "undefined" && window.innerWidth < 768;
+
+// Une série par joueur affiché ; le cumul (colonnes BE.. de la feuille)
 // est défini pour chaque manche. La fenêtre limite aux N dernières parties,
 // "départ à zéro" rebase chaque joueur sur son cumul d'avant la fenêtre.
-const chartDataFormatted = computed(() => {
-  if (games.value.length === 0) return { labels: [], datasets: [] };
+// L'avatar à initiales est dessiné par ECharts via `endLabel` (badge rond au
+// bout de chaque courbe), ce qui remplace l'ancien plugin canvas de chart.js.
+const chartOption = computed(() => {
+  const ink = isDark.value ? "#FFFFFF" : "#113B54";
+  const grid = isDark.value ? "rgba(255, 255, 255, 0.2)" : "rgba(17, 59, 84, 0.15)";
+  const badgeStroke = isDark.value ? "#113B54" : "#FFFFFF";
+  const narrow = isNarrow();
+  const badge = narrow ? 22 : 30;
+  const font = narrow ? 10 : 12;
 
   const all = games.value;
   const start =
@@ -135,121 +142,94 @@ const chartDataFormatted = computed(() => {
   const window = all.slice(start);
   const previous = start > 0 ? all[start - 1] : null;
 
-  return {
-    labels: window.map((game) => `Partie ${game.numero}`),
-    datasets: activePlayers.value
-      .filter((name) => !hiddenPlayers.value.includes(name))
-      .map((name) => {
-        const baseline =
-          zeroStart.value && previous ? previous.cumulativeScores[name] ?? 0 : 0;
-        return {
-          label: name,
-          borderColor: playerColor(name),
-          backgroundColor: playerColor(name) + "20",
-          pointBorderColor: "#00000000",
-          pointBackgroundColor: "#00000000",
-          data: window.map((game) => (game.cumulativeScores[name] ?? 0) - baseline),
-          fill: false,
-          tension: 0.2,
-          playerName: name,
-        };
-      }),
-  };
-});
-
-// Sur mobile : marges réduites, polices plus petites, avatars compacts
-const isNarrow = () => window.innerWidth < 768;
-
-const chartOptions = computed(() => {
-  const ink = isDark.value ? "#FFFFFF" : "#113B54";
-  const grid = isDark.value ? "rgba(255, 255, 255, 0.2)" : "rgba(17, 59, 84, 0.15)";
-  const narrow = isNarrow();
-  const axis = {
-    grid: { color: grid },
-    ticks: {
-      color: ink,
-      font: { family: "'Poppins', sans-serif", size: narrow ? 10 : 12 },
-    },
-  };
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: 200,
-    layout: {
-      padding: {
-        right: narrow ? 40 : 80,
-      },
-    },
-    plugins: {
-      // la légende est remplacée par les puces de filtre au-dessus du graphique
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        mode: "index",
-        intersect: false,
-        backgroundColor: isDark.value
-          ? "rgba(10, 36, 52, 0.95)"
-          : "rgba(255, 255, 255, 0.95)",
-        titleColor: ink,
-        bodyColor: ink,
-        callbacks: {
-          label: (tooltipItem) =>
-            `${tooltipItem.dataset.label}: ${tooltipItem.raw.toFixed(1)} points`,
-          labelColor: (tooltipItem) => ({
-            borderColor: tooltipItem.dataset.borderColor,
-            backgroundColor: tooltipItem.dataset.borderColor,
-            borderWidth: 0,
-            borderRadius: 4,
-          }),
-          itemSort: (a, b) => b.raw - a.raw,
+  const series = activePlayers.value
+    .filter((name) => !hiddenPlayers.value.includes(name))
+    .map((name) => {
+      const color = playerColor(name);
+      const baseline =
+        zeroStart.value && previous ? previous.cumulativeScores[name] ?? 0 : 0;
+      return {
+        name,
+        type: "line",
+        smooth: true,
+        showSymbol: false,
+        symbolSize: 6,
+        lineStyle: { width: 2, color },
+        itemStyle: { color },
+        emphasis: { focus: "series" },
+        data: window.map((game) => (game.cumulativeScores[name] ?? 0) - baseline),
+        endLabel: {
+          show: true,
+          formatter: () => playerInitials(name),
+          color: "#113B54",
+          fontFamily: "Poppins, sans-serif",
+          fontWeight: "bold",
+          fontSize: narrow ? 9 : 11,
+          backgroundColor: color,
+          borderColor: badgeStroke,
+          borderWidth: 2,
+          borderRadius: badge / 2,
+          width: badge,
+          height: badge,
+          align: "center",
+          verticalAlign: "middle",
+          lineHeight: badge,
+          padding: 0,
+          offset: [badge / 2 + (narrow ? 6 : 10), 0],
         },
-        padding: 12,
-        caretSize: 6,
-        caretPadding: 8,
-        cornerRadius: 8,
-        displayColors: true,
+      };
+    });
+
+  return {
+    animationDuration: 200,
+    // la légende est remplacée par les puces de filtre au-dessus du graphique
+    grid: {
+      left: 8,
+      right: badge + (narrow ? 24 : 48),
+      top: 16,
+      bottom: 8,
+      containLabel: true,
+    },
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: isDark.value
+        ? "rgba(10, 36, 52, 0.95)"
+        : "rgba(255, 255, 255, 0.95)",
+      borderColor: isDark.value ? "rgba(255,255,255,0.15)" : "rgba(17,59,84,0.15)",
+      borderWidth: 1,
+      textStyle: { color: ink, fontFamily: "Poppins, sans-serif" },
+      extraCssText: "border-radius:8px;",
+      axisPointer: { type: "line", lineStyle: { color: grid } },
+      formatter: (params) => {
+        const title = params[0]?.axisValueLabel ?? "";
+        const rows = [...params]
+          .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+          .map(
+            (p) =>
+              `<div style="display:flex;justify-content:space-between;gap:16px;line-height:1.6">` +
+              `<span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:${p.color};margin-right:6px"></span>${p.seriesName}</span>` +
+              `<b>${Number(p.value ?? 0).toFixed(1)} pts</b></div>`
+          )
+          .join("");
+        return `<div style="font-weight:600;margin-bottom:4px">${title}</div>${rows}`;
       },
     },
-    scales: {
-      x: axis,
-      y: axis,
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: window.map((game) => `Partie ${game.numero}`),
+      axisLine: { lineStyle: { color: grid } },
+      axisTick: { show: false },
+      axisLabel: { color: ink, fontFamily: "Poppins, sans-serif", fontSize: font },
+      splitLine: { show: false },
     },
+    yAxis: {
+      type: "value",
+      axisLine: { show: false },
+      axisLabel: { color: ink, fontFamily: "Poppins, sans-serif", fontSize: font },
+      splitLine: { lineStyle: { color: grid } },
+    },
+    series,
   };
 });
-
-// Avatar à initiales dessiné au bout de chaque ligne (remplace les photos
-// de l'ancienne version : la feuille ne stocke que des noms).
-const initialsAvatarPlugin = {
-  id: "initialsAvatars",
-  afterDatasetsDraw(chart) {
-    const { ctx } = chart;
-    chart.data.datasets.forEach((dataset, i) => {
-      if (!dataset.playerName) return;
-      const meta = chart.getDatasetMeta(i);
-      if (!meta || meta.hidden || !meta.data.length) return;
-
-      const lastPoint = meta.data[meta.data.length - 1];
-      const size = chart.width < 500 ? 22 : 30;
-      const x = lastPoint.x + (chart.width < 500 ? 8 : 15) + size / 2;
-      const y = lastPoint.y;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, size / 2, 0, Math.PI * 2);
-      ctx.fillStyle = playerColor(dataset.playerName);
-      ctx.fill();
-      ctx.strokeStyle = isDark.value ? "#113B54" : "#FFFFFF";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.fillStyle = "#113B54";
-      ctx.font = `bold ${size < 30 ? 8 : 11}px Poppins, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(playerInitials(dataset.playerName), x, y + 1);
-      ctx.restore();
-    });
-  },
-};
-
-Chart.register(initialsAvatarPlugin);
 </script>
