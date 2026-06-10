@@ -5,6 +5,7 @@ import Games from "@/Pages/Games.vue";
 import NewGame from "@/Pages/NewGame.vue";
 import ChartPage from "@/Pages/Chart.vue";
 import Stats from "@/Pages/Stats.vue";
+import Season from "@/Pages/Season.vue";
 import Players from "@/Pages/Players.vue";
 import Rules from "@/Pages/Rules.vue";
 
@@ -17,6 +18,7 @@ export default createRouter({
         { path: "/new-game", component: NewGame },
         { path: "/chart", component: ChartPage },
         { path: "/stats", component: Stats },
+        { path: "/season", component: Season },
         { path: "/players", component: Players },
         { path: "/rules", component: Rules },
         { path: "/:pathMatch(.*)*", redirect: "/" },

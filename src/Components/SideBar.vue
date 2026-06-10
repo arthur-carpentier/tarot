@@ -122,6 +122,7 @@ import {
   ExternalLinkIcon,
   SunIcon,
   MoonIcon,
+  StarIcon,
 } from "@heroicons/vue/outline";
 import { SHEET_URL } from "@/config";
 import { useTheme } from "@/composables/useTheme";
@@ -133,6 +134,7 @@ const centeredMenuItems = [
   { title: "Parties", link: "/games", icon: ViewListIcon },
   { title: "Graphique", link: "/chart", icon: TrendingUpIcon },
   { title: "Statistiques", link: "/stats", icon: ChartBarIcon },
+  { title: "Carte résumée", link: "/season", icon: StarIcon },
 ];
 
 const bottomMenuItems = [

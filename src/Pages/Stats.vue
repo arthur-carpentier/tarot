@@ -296,7 +296,8 @@ const playerDetails = computed(() =>
         const score = game.scores[name] ?? 0;
         stat.parties++;
         if (isPreneur) stat.preneur++;
-        if (isAppele && !isPreneur) stat.appele++;
+        // comme la feuille : l'auto-appel compte aussi comme "appelé"
+        if (isAppele) stat.appele++;
         if (isDefense) stat.defense++;
         if (isPreneur || isAppele) stat.attaque++;
         const win = score > 0;

@@ -168,6 +168,27 @@ export async function fetchGames() {
     return { games, playerNames: playerColumns.map((c) => c.name) };
 }
 
+// Onglet "Statistiques pour carte résumée" : numéro et dates de la saison.
+export async function fetchSeasonMeta() {
+    try {
+        const table = await fetchGviz("Statistiques pour carte résumée", "A2:C2");
+        const row = table.rows?.[0];
+        if (!row) return null;
+        const parseDate = (value) => {
+            // gviz renvoie les dates sous la forme "Date(2026,3,1)" (mois base 0)
+            const match = /Date\((\d+),(\d+),(\d+)/.exec(String(value ?? ""));
+            return match ? new Date(+match[1], +match[2], +match[3]) : null;
+        };
+        return {
+            numero: Number(cellValue(row, 0)) || null,
+            debut: parseDate(cellValue(row, 1)),
+            fin: parseDate(cellValue(row, 2)),
+        };
+    } catch {
+        return null;
+    }
+}
+
 // Ajout d'une partie via le script Apps Script déployé en Web App.
 // Le body est envoyé en text/plain pour éviter le preflight CORS
 // (Apps Script ne répond pas aux requêtes OPTIONS).
