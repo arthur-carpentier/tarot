@@ -1,66 +1,72 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Tarot
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Application web de suivi des parties de tarot. Entièrement statique (Vue 3 +
+Vite + Tailwind), hébergée sur **GitHub Pages**, avec le
+[Google Sheet](https://docs.google.com/spreadsheets/d/1BRs8pRcSWjVSaukepufJvhKZOXczsXSur61r2X0nDK8/edit)
+comme seule base de données.
 
-## About Laravel
+## Fonctionnement
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```
+┌──────────────────┐   lecture (gviz JSON, public)   ┌────────────────┐
+│  App GitHub Pages │ ───────────────────────────────▶│  Google Sheet  │
+│  (Vue 3 statique) │                                  │   "Parties"    │
+│                   │   écriture (POST)                │   "Données"    │
+│                   │ ──────────▶ Apps Script ────────▶│                │
+└──────────────────┘             (Web App)            └────────────────┘
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Lecture** : l'application interroge directement la feuille via l'endpoint
+  public `gviz` de Google Sheets (la feuille est accessible en lecture par
+  lien). Aucun backend, aucune clé d'API.
+- **Écriture** : l'ajout d'une partie passe par un petit script
+  [Google Apps Script](apps-script/README.md) attaché à la feuille et déployé
+  en Web App. Il écrit les colonnes de saisie (B–K, Q–V) sur la première ligne
+  libre de l'onglet `Parties` ; les formules de la feuille calculent tout le
+  reste (points, scores cumulés, classements).
+- Les joueurs et barèmes (annonces, bonus, poignées) viennent de l'onglet
+  `Données` ; ils se modifient directement dans la feuille.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Pages
 
-## Learning Laravel
+- **Parties** : liste des manches avec attaque/défense, annonce, bouts, points.
+- **Nouvelle partie** : formulaire de saisie avec prévisualisation des points
+  (mêmes formules que la feuille), enregistrement dans le Sheet.
+- **Graphique** : évolution des scores cumulés par joueur.
+- **Statistiques** : classement, stats par annonce, attaque vs défense.
+- **Joueurs / Règles** : lecture seule depuis l'onglet `Données`.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Développement
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+npm install
+npm run dev      # serveur de dev (http://localhost:5173/tarot/)
+npm run build    # build de production dans dist/
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Déploiement
 
-## Laravel Sponsors
+1. **GitHub Pages** : dans *Settings → Pages*, choisir **GitHub Actions** comme
+   source. Le workflow [`deploy.yml`](.github/workflows/deploy.yml) build et
+   déploie automatiquement à chaque push sur `master`.
+   L'application est servie sur `https://<user>.github.io/tarot/`
+   (le `base` est configuré dans `vite.config.js`).
+2. **Apps Script** : suivre [apps-script/README.md](apps-script/README.md) pour
+   déployer le script d'écriture, puis coller son URL dans le panneau ⚙️ de la
+   page « Nouvelle partie » (ou la renseigner en dur dans `src/config.js`).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Structure
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+src/
+├── config.js               # ID de la feuille, URL du script Apps Script
+├── services/
+│   ├── sheets.js           # lecture gviz + écriture via Apps Script
+│   ├── scoring.js          # réplique des formules de score (prévisualisation)
+│   └── avatars.js          # couleurs/initiales des joueurs
+├── composables/
+│   └── useTarotData.js     # store partagé (joueurs, règles, parties)
+├── Components/             # layout, sidebar, avatars
+└── Pages/                  # Parties, Nouvelle partie, Graphique, Stats…
+apps-script/                # script d'écriture à déployer sur la feuille
+```

@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+thead tr {
+    @apply bg-dark-lighter text-light-darker;
+}
+
+tbody tr {
+    @apply bg-dark-lighter hover:bg-dark-lightest font-bold;
+}
