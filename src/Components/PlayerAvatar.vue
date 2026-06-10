@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-full shadow-md flex items-center justify-center font-bold text-dark select-none shrink-0"
+    class="rounded-full shadow-md flex items-center justify-center font-bold text-navy select-none shrink-0"
     :class="sizeClass"
     :style="{ backgroundColor: playerColor(name) }"
     :title="name"

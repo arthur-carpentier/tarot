@@ -7,16 +7,16 @@
     <!-- Configuration du script d'écriture -->
     <div
       v-if="!scriptUrl || showConfig"
-      class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-4xl mx-auto mb-6 border border-yellow-600"
+      class="bg-watergreen dark:bg-navy p-6 rounded-lg shadow-lg max-w-4xl mx-auto mb-6 border-2 border-chartreuse"
     >
       <h2 class="text-xl font-semibold mb-2">
         <i class="fa-solid fa-gear mr-2"></i>Script d'enregistrement
       </h2>
-      <p class="text-sm text-light-darker mb-4">
+      <p class="text-sm text-navy/60 dark:text-periwinkle/80 mb-4">
         La lecture se fait directement depuis le Google Sheet, mais l'ajout de parties
         passe par un script Google Apps Script déployé en Web App (voir le dossier
-        <code class="bg-dark px-1 rounded">apps-script/</code> du dépôt). Collez ici
-        l'URL du déploiement (<code class="bg-dark px-1 rounded"
+        <code class="bg-navy/10 dark:bg-white/10 px-1 rounded">apps-script/</code> du dépôt). Collez ici
+        l'URL du déploiement (<code class="bg-navy/10 dark:bg-white/10 px-1 rounded"
           >https://script.google.com/macros/s/…/exec</code
         >).
       </p>
@@ -25,22 +25,22 @@
           v-model="scriptUrlInput"
           type="url"
           placeholder="https://script.google.com/macros/s/…/exec"
-          class="flex-1 min-w-[16rem] bg-dark border-dark-lightest rounded p-2 text-light"
+          class="flex-1 min-w-[16rem] bg-navy/10 dark:bg-white/10 border-navy/10 dark:border-white/10 rounded p-2 text-navy dark:text-white"
         />
         <button
           @click="saveScriptUrl"
-          class="bg-blue-600 px-4 py-2 rounded font-semibold"
+          class="bg-chartreuse text-navy px-4 py-2 rounded font-semibold hover:brightness-95"
         >
           Enregistrer
         </button>
       </div>
     </div>
 
-    <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-4xl mx-auto relative">
+    <div class="bg-watergreen dark:bg-navy p-6 rounded-lg shadow-lg max-w-4xl mx-auto relative">
       <button
         v-if="scriptUrl"
         @click="showConfig = !showConfig"
-        class="absolute top-3 right-3 text-light-darker hover:text-light"
+        class="absolute top-3 right-3 text-navy/60 dark:text-periwinkle/80 hover:text-navy dark:hover:text-white"
         title="Configurer le script d'enregistrement"
       >
         <i class="fa-solid fa-gear"></i>
@@ -48,14 +48,14 @@
 
       <form @submit.prevent="submitGame" class="space-y-6">
         <!-- Annonce -->
-        <div class="bg-gray-700 p-4 rounded-lg">
+        <div class="bg-white dark:bg-white/5 p-4 rounded-lg">
           <label class="block text-2xl font-semibold">Annonce</label>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
             <template v-if="loading">
               <div
                 v-for="n in 6"
                 :key="n"
-                class="h-16 bg-gray-600 rounded-lg animate-pulse"
+                class="h-16 bg-navy/10 dark:bg-white/10 rounded-lg animate-pulse"
               ></div>
             </template>
             <template v-else>
@@ -75,7 +75,7 @@
                   'hover:brightness-110 hover:saturate-125':
                     selectedAnnonce !== annonce.name,
                 }"
-                :style="{ backgroundColor: annonceColor(annonce.name) }"
+                :style="annonceStyle(annonce.name)"
               >
                 {{ annonce.name }}
                 <span class="block text-xs opacity-80">×{{ annonce.multiplicateur }}</span>
@@ -86,7 +86,7 @@
 
         <!-- Joueurs -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-gray-700 p-4 rounded-lg">
+          <div class="bg-white dark:bg-white/5 p-4 rounded-lg">
             <h2 class="text-xl font-semibold mb-4">Attaque</h2>
             <div class="grid grid-cols-2 gap-4">
               <!-- Preneur -->
@@ -96,7 +96,7 @@
                   <div
                     v-for="n in 4"
                     :key="n"
-                    class="h-12 mb-2 bg-gray-600 rounded-lg animate-pulse"
+                    class="h-12 mb-2 bg-navy/10 dark:bg-white/10 rounded-lg animate-pulse"
                   ></div>
                 </template>
                 <template v-else>
@@ -126,7 +126,7 @@
               <div>
                 <label class="block text-sm font-medium mb-2">
                   Appelé
-                  <span class="block text-xs text-light-darker font-normal">
+                  <span class="block text-xs text-navy/60 dark:text-periwinkle/80 font-normal">
                     (le preneur peut s'appeler lui-même)
                   </span>
                 </label>
@@ -134,7 +134,7 @@
                   <div
                     v-for="n in 4"
                     :key="n"
-                    class="h-12 mb-2 bg-gray-600 rounded-lg animate-pulse"
+                    class="h-12 mb-2 bg-navy/10 dark:bg-white/10 rounded-lg animate-pulse"
                   ></div>
                 </template>
                 <template v-else>
@@ -162,7 +162,7 @@
             </div>
           </div>
 
-          <div class="bg-gray-700 p-4 rounded-lg">
+          <div class="bg-white dark:bg-white/5 p-4 rounded-lg">
             <h2 class="text-xl font-semibold mb-4">Défense</h2>
             <label class="block text-sm font-medium mb-2">
               Sélectionner 3-4 joueurs
@@ -171,7 +171,7 @@
               <div
                 v-for="n in 4"
                 :key="n"
-                class="h-12 mb-2 bg-gray-600 rounded-lg animate-pulse"
+                class="h-12 mb-2 bg-navy/10 dark:bg-white/10 rounded-lg animate-pulse"
               ></div>
             </template>
             <template v-else>
@@ -200,15 +200,15 @@
         </div>
 
         <!-- Pour qui sont comptés points et bouts -->
-        <div class="bg-gray-700 p-4 rounded-lg">
+        <div class="bg-white dark:bg-white/5 p-4 rounded-lg">
           <label class="block text-2xl font-semibold">Points comptés pour…</label>
-          <p class="text-sm text-light-darker">
+          <p class="text-sm text-navy/60 dark:text-periwinkle/80">
             Les points et les bouts saisis ci-dessous sont ceux de ce camp.
           </p>
           <div class="grid grid-cols-2 gap-4 mt-2">
             <div
               @click="pour = pour === 'Attaque' ? null : 'Attaque'"
-              class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200 hover:brightness-110 hover:saturate-125"
+              class="p-4 text-center font-semibold text-white cursor-pointer rounded-lg transition-all duration-200 hover:brightness-110 hover:saturate-125"
               :style="{ backgroundColor: '#dc2626' }"
               :class="{
                 'scale-105': pour === 'Attaque',
@@ -220,7 +220,7 @@
             </div>
             <div
               @click="pour = pour === 'Défense' ? null : 'Défense'"
-              class="p-4 text-center font-semibold cursor-pointer rounded-lg transition-all duration-200 hover:brightness-110 hover:saturate-125"
+              class="p-4 text-center font-semibold text-white cursor-pointer rounded-lg transition-all duration-200 hover:brightness-110 hover:saturate-125"
               :style="{ backgroundColor: '#2563eb' }"
               :class="{
                 'scale-105': pour === 'Défense',
@@ -234,9 +234,9 @@
         </div>
 
         <!-- Bouts -->
-        <div class="bg-gray-700 p-4 rounded-lg">
+        <div class="bg-white dark:bg-white/5 p-4 rounded-lg">
           <label class="block text-2xl font-semibold">
-            Bouts<span v-if="pour" class="text-base font-normal text-light-darker">
+            Bouts<span v-if="pour" class="text-base font-normal text-navy/60 dark:text-periwinkle/80">
               ({{ pour }})</span
             >
           </label>
@@ -259,9 +259,9 @@
         </div>
 
         <!-- Points -->
-        <div class="bg-gray-700 p-4 rounded-lg">
+        <div class="bg-white dark:bg-white/5 p-4 rounded-lg">
           <label class="block text-2xl font-semibold">
-            Points<span v-if="pour" class="text-base font-normal text-light-darker">
+            Points<span v-if="pour" class="text-base font-normal text-navy/60 dark:text-periwinkle/80">
               ({{ pour }})</span
             >
           </label>
@@ -279,7 +279,7 @@
                   '--fill-percent': (points / 91) * 100,
                 }"
               />
-              <div class="flex text-sm text-light-700 -mt-1">
+              <div class="flex text-sm text-navy/60 dark:text-periwinkle/80 -mt-1">
                 <span>0</span>
                 <span class="ml-[37%]">36</span>
                 <span class="ml-[3.4%]">41</span>
@@ -295,13 +295,13 @@
               min="0"
               max="91"
               step="0.5"
-              class="text-dark p-1 rounded -translate-y-2 w-16"
+              class="text-navy p-1 rounded -translate-y-2 w-16"
             />
           </div>
         </div>
 
         <!-- Bonus -->
-        <div class="bg-gray-700 p-4 rounded-lg">
+        <div class="bg-white dark:bg-white/5 p-4 rounded-lg">
           <label class="block text-2xl font-semibold">Bonus</label>
           <div class="grid gap-4 mt-2">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -315,7 +315,7 @@
                   'brightness-125 saturate-125': toggles[bonus.key],
                   'hover:brightness-110 hover:saturate-125': !toggles[bonus.key],
                 }"
-                :style="{ backgroundColor: '#007700' }"
+                style="background-color: #024442; color: #ffffff"
               >
                 {{ bonus.label }}
                 <span class="block text-xs opacity-80">+{{ bonus.points }} pts</span>
@@ -332,7 +332,7 @@
                   'brightness-125 saturate-125': toggles[poignee.key],
                   'hover:brightness-110 hover:saturate-125': !toggles[poignee.key],
                 }"
-                :style="{ backgroundColor: '#007700' }"
+                style="background-color: #024442; color: #ffffff"
               >
                 {{ poignee.label }}
                 <span class="block text-xs opacity-80">+{{ poignee.points }} pts</span>
@@ -341,17 +341,20 @@
           </div>
         </div>
 
-        <p v-if="submitError" class="text-red-400 font-semibold text-center">
+        <p v-if="submitError" class="text-red-600 dark:text-red-400 font-semibold text-center">
           {{ submitError }}
         </p>
-        <p v-if="submitSuccess" class="text-green-bright font-semibold text-center">
+        <p v-if="submitSuccess" class="text-pine dark:text-chartreuse font-semibold text-center">
           Partie n°{{ submitSuccess }} enregistrée dans le Google Sheet !
         </p>
 
         <button
           type="submit"
-          class="bg-blue-600 text-light px-4 py-2 rounded w-full text-2xl font-semibold"
-          :class="{ 'bg-gray-500 cursor-not-allowed': isDisabled || submitting }"
+          class="bg-chartreuse text-navy px-4 py-2 rounded w-full text-2xl font-semibold hover:brightness-95"
+          :class="{
+            '!bg-navy/20 !text-navy/40 dark:!bg-white/10 dark:!text-white/40 cursor-not-allowed':
+              isDisabled || submitting,
+          }"
           :disabled="isDisabled || submitting"
         >
           {{ submitting ? "Enregistrement…" : "Ajouter" }}
@@ -361,14 +364,14 @@
 
     <!-- Prévisualisation des points -->
     <div
-      class="bg-gray-800 p-6 rounded-lg shadow-lg mx-auto max-w-4xl md:max-w-xl mt-4"
+      class="bg-watergreen dark:bg-navy p-6 rounded-lg shadow-lg mx-auto max-w-4xl md:max-w-xl mt-4"
       v-if="preview"
     >
-      <div class="bg-gray-700 p-4 px-6 md:px-12 rounded-lg">
+      <div class="bg-white dark:bg-white/5 p-4 px-6 md:px-12 rounded-lg">
         <div class="block text-2xl font-semibold text-center">
           <span>Prévisualisation des points</span>
         </div>
-        <p class="text-center text-sm text-light-darker mt-1">
+        <p class="text-center text-sm text-navy/60 dark:text-periwinkle/80 mt-1">
           {{ preview.fait ? "Contrat fait" : "Contrat chuté" }} de
           {{ Math.abs(preview.pointsAttaque - preview.pointsAFaire).toFixed(1) }}
           ({{ preview.pointsAttaque.toFixed(1) }} / {{ preview.pointsAFaire }})
@@ -388,7 +391,7 @@
             </div>
             <span
               class="my-auto text-right"
-              :class="entry.points >= 0 ? 'text-green-400' : 'text-red-400'"
+              :class="entry.points >= 0 ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
             >
               {{ (entry.points >= 0 ? "+" : "") + entry.points.toFixed(1) }} pts
             </span>
@@ -406,6 +409,7 @@ import PlayerAvatar from "@/Components/PlayerAvatar.vue";
 import { useTarotData } from "@/composables/useTarotData";
 import { appendGame } from "@/services/sheets";
 import { computeRound, distributePoints } from "@/services/scoring";
+import { annonceStyle } from "@/services/avatars";
 import { getAppsScriptUrl, setAppsScriptUrl } from "@/config";
 
 const { players, annonces, bonuses, poignees, loading, refresh } = useTarotData();
@@ -474,16 +478,6 @@ const togglePoignee = (key) => {
   toggles.triplePoignee = false;
   toggles[key] = !wasActive;
 };
-
-const ANNONCE_COLORS = {
-  Petite: "#2563eb",
-  Garde: "#007700",
-  "Garde sans": "#d97706",
-  "Garde contre": "#dc2626",
-  "Petit chelem": "#7c3aed",
-  "Grand chelem": "#be185d",
-};
-const annonceColor = (name) => ANNONCE_COLORS[name] || "#555";
 
 const selectPreneur = (player) => {
   if (preneur.value === player) {

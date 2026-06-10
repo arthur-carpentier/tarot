@@ -12,14 +12,14 @@
       ></div>
       <div class="relative z-10">
         <h1 class="text-5xl font-extrabold">Bienvenue sur Tarot</h1>
-        <p class="text-lg text-gray-200 mt-4">
+        <p class="text-lg text-navy/70 dark:text-periwinkle/80 mt-4">
           Les parties, les scores et les statistiques, directement depuis le Google
           Sheet.
         </p>
         <div class="mt-6">
           <router-link
             to="/games"
-            class="px-6 py-3 bg-yellow-500 text-light font-semibold rounded-lg shadow-lg hover:bg-yellow-600 transition"
+            class="px-6 py-3 bg-chartreuse text-navy font-semibold rounded-lg shadow-lg hover:brightness-95 transition"
           >
             Commencer
           </router-link>

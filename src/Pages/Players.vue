@@ -6,13 +6,13 @@
         :href="sheetUrl"
         target="_blank"
         rel="noopener"
-        class="bg-dark-lighter border border-dark-lightest px-4 py-2 rounded text-light font-semibold shadow-md hover:bg-dark-lightest transition"
+        class="bg-watergreen dark:bg-navy border border-navy/10 dark:border-white/10 px-4 py-2 rounded text-navy dark:text-white font-semibold shadow-md hover:bg-periwinkle/40 dark:hover:bg-white/10 transition"
       >
         <i class="fa-solid fa-arrow-up-right-from-square mr-2"></i>Modifier dans le Sheet
       </a>
     </div>
 
-    <p class="text-light-darker mb-6">
+    <p class="text-navy/60 dark:text-periwinkle/80 mb-6">
       La liste des joueurs vient de l'onglet « Données » du Google Sheet. Pour ajouter ou
       renommer un joueur, modifiez directement la feuille.
     </p>
@@ -21,29 +21,29 @@
       <div
         v-for="n in 6"
         :key="n"
-        class="h-24 rounded-lg bg-dark-lighter animate-pulse"
+        class="h-24 rounded-lg bg-watergreen dark:bg-navy animate-pulse"
       ></div>
     </div>
 
-    <p v-else-if="error" class="text-center text-red-400 text-lg">{{ error }}</p>
+    <p v-else-if="error" class="text-center text-red-600 dark:text-red-400 text-lg">{{ error }}</p>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
         v-for="entry in standings"
         :key="entry.name"
-        class="rounded-lg p-4 border border-dark-lightest bg-dark-lighter flex items-center space-x-4"
+        class="rounded-lg p-4 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy flex items-center space-x-4"
       >
         <PlayerAvatar :name="entry.name" size="lg" />
         <div class="flex-1 min-w-0">
           <div class="font-bold text-lg truncate">{{ entry.name }}</div>
-          <div class="text-sm text-light-darker">
+          <div class="text-sm text-navy/60 dark:text-periwinkle/80">
             {{ entry.participations }} partie{{ entry.participations > 1 ? "s" : "" }}
             · {{ entry.victoires }} victoire{{ entry.victoires > 1 ? "s" : "" }}
           </div>
         </div>
         <div
           class="text-xl font-bold"
-          :class="entry.score >= 0 ? 'text-green-bright' : 'text-red-500'"
+          :class="entry.score >= 0 ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
         >
           {{ entry.score.toFixed(1) }}
         </div>

@@ -5,25 +5,24 @@ import forms from "@tailwindcss/forms";
 export default {
     content: ["./index.html", "./src/**/*.{vue,js}"],
 
+    darkMode: "class",
+
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Poppins", "Figtree", ...defaultTheme.fontFamily.sans],
+                sans: ["Mulish", ...defaultTheme.fontFamily.sans],
+                display: ["Poppins", ...defaultTheme.fontFamily.sans],
             },
+            // Charte graphique vorteX-io
             colors: {
-                dark: {
-                    DEFAULT: "#0f0f0f",
-                    lighter: "#202020",
-                    lightest: "#404040",
+                navy: {
+                    DEFAULT: "#113B54",
+                    deep: "#0A2434",
                 },
-                green: {
-                    bright: "#5dd62c",
-                    dark: "#337418",
-                },
-                light: {
-                    DEFAULT: "#f8f8f8",
-                    darker: "#bbbbbb",
-                },
+                chartreuse: "#DBE64C",
+                periwinkle: "#BBD1FF",
+                watergreen: "#E2F4DF",
+                pine: "#024442",
             },
         },
     },

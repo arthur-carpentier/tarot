@@ -1,8 +1,9 @@
 import "./assets/app.css";
 
-import "@fontsource/poppins/300.css";
+import "@fontsource/mulish/400.css";
+import "@fontsource/mulish/600.css";
+import "@fontsource/mulish/700.css";
 import "@fontsource/poppins/400.css";
-import "@fontsource/poppins/500.css";
 import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 import "@fontsource/poppins/800.css";

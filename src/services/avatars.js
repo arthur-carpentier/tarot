@@ -39,6 +39,21 @@ export function playerColor(name) {
     return PALETTE[index % PALETTE.length];
 }
 
+// Badges/boutons d'annonce : fond + couleur de texte dans la charte.
+const ANNONCE_STYLES = {
+    Petite: ["#BBD1FF", "#113B54"],
+    Garde: ["#E2F4DF", "#113B54"],
+    "Garde sans": ["#DBE64C", "#113B54"],
+    "Garde contre": ["#024442", "#FFFFFF"],
+    "Petit chelem": ["#113B54", "#FFFFFF"],
+    "Grand chelem": ["#113B54", "#DBE64C"],
+};
+
+export function annonceStyle(name) {
+    const [backgroundColor, color] = ANNONCE_STYLES[name] || ["#113B54", "#FFFFFF"];
+    return { backgroundColor, color };
+}
+
 export function playerInitials(name) {
     return name
         .split(/[\s-]+/)
