@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Charte graphique vorteX-io */
+:root {
+    --color-navy: #113b54;
+    --color-chartreuse: #dbe64c;
+    --color-white: #ffffff;
+    --color-periwinkle: #bbd1ff;
+    --color-water-green: #e2f4df;
+    --color-pine: #024442;
+}
+
+@layer base {
+    body {
+        @apply bg-white text-navy dark:bg-navy-deep dark:text-white;
+    }
+
+    h1,
+    h2,
+    h3 {
+        @apply font-display;
+    }
+}
+
+thead tr {
+    @apply text-navy/60 dark:text-periwinkle/80;
+}
+
+tbody tr {
+    @apply font-semibold hover:bg-periwinkle/30 dark:hover:bg-white/5;
+}

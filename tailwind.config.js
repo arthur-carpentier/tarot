@@ -1,41 +1,31 @@
-import defaultTheme from 'tailwindcss/defaultTheme';
-import forms from '@tailwindcss/forms';
-import typography from '@tailwindcss/typography';
+import defaultTheme from "tailwindcss/defaultTheme";
+import forms from "@tailwindcss/forms";
 
 /** @type {import('tailwindcss').Config} */
 export default {
-    content: [
-        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './vendor/laravel/jetstream/**/*.blade.php',
-        './storage/framework/views/*.php',
-        './resources/views/**/*.blade.php',
-        './resources/js/**/*.vue',
-        "./pages/**/*.{js,ts,jsx,tsx}",
-        "./components/**/*.{js,ts,jsx,tsx}",
-    ],
+    content: ["./index.html", "./src/**/*.{vue,js}"],
+
+    darkMode: "class",
 
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Poppins', 'Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ["Mulish", ...defaultTheme.fontFamily.sans],
+                display: ["Poppins", ...defaultTheme.fontFamily.sans],
             },
+            // Charte graphique vorteX-io
             colors: {
-                dark: {
-                    DEFAULT: "#0f0f0f",
-                    lighter: "#202020",
-                    lightest: "#404040",
+                navy: {
+                    DEFAULT: "#113B54",
+                    deep: "#0A2434",
                 },
-                green: {
-                    bright: "#5dd62c",
-                    dark: "#337418",
-                },
-                light: {
-                    DEFAULT: "#f8f8f8",
-                    darker: "#bbbbbb",
-                },
+                chartreuse: "#DBE64C",
+                periwinkle: "#BBD1FF",
+                watergreen: "#E2F4DF",
+                pine: "#024442",
             },
         },
     },
 
-    plugins: [forms, typography],
+    plugins: [forms],
 };
