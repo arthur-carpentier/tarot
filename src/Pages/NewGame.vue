@@ -226,7 +226,7 @@
           <p class="text-sm font-medium mb-2">
             Bouts<template v-if="pour"> ({{ pour }})</template>
           </p>
-          <div class="grid grid-cols-3 gap-2 mb-4">
+          <div class="grid grid-cols-3 gap-2 mb-1">
             <button
               v-for="bout in bouts"
               :key="bout"
@@ -242,44 +242,53 @@
               {{ bout }}
             </button>
           </div>
-
-          <p class="text-sm font-medium mb-1">
-            Points<template v-if="pour"> ({{ pour }})</template>
-            <span v-if="preview" class="text-navy/50 dark:text-periwinkle/70 font-normal">
-              — objectif attaque : {{ preview.pointsAFaire }}
-            </span>
+          <!-- Seuil mis à jour en direct selon les bouts et le camp -->
+          <p class="text-xs text-navy/60 dark:text-periwinkle/80 mb-4 min-h-[1rem]">
+            <template v-if="seuilInfo">
+              {{ seuilInfo.boutsAttaque }} bout{{ seuilInfo.boutsAttaque > 1 ? "s" : "" }}
+              pour l'attaque → elle doit faire
+              <b>{{ seuilInfo.objectifAttaque }} points</b
+              ><template v-if="pour === 'Défense'">
+                (la défense fait chuter à partir de
+                <b>{{ seuilInfo.seuilDefense }}</b
+                >)</template
+              >.
+            </template>
+            <template v-else>Choisis le camp pour voir le seuil de points.</template>
           </p>
-          <div class="flex items-center gap-3">
-            <div class="relative w-full">
-              <input
-                type="range"
-                v-model.number="points"
-                min="0"
-                max="91"
-                step="0.5"
-                class="w-full cursor-pointer custom-range"
-                :style="{
-                  '--slider-color': getColor(points),
-                  '--fill-percent': (points / 91) * 100,
-                }"
-              />
-              <div class="flex text-xs text-navy/50 dark:text-periwinkle/70 -mt-1">
-                <span>0</span>
-                <span class="ml-[37%]">36</span>
-                <span class="ml-[3.4%]">41</span>
-                <span class="ml-[9.2%]">51</span>
-                <span class="ml-[3.4%]">56</span>
-                <span class="ml-auto">91</span>
-              </div>
-            </div>
-            <input
-              type="number"
-              v-model.number="points"
-              min="0"
-              max="91"
-              step="0.5"
-              class="text-navy p-1.5 rounded w-20 text-center font-bold bg-white border-navy/20 shrink-0 -translate-y-2"
+
+          <p class="text-sm font-medium mb-2">
+            Points<template v-if="pour"> ({{ pour }})</template>
+          </p>
+          <div class="flex items-stretch gap-4">
+            <WheelPicker
+              v-model="points"
+              class="w-24 shrink-0 bg-white dark:bg-white/10 rounded-lg ring-1 ring-navy/10 dark:ring-white/10"
             />
+            <div class="flex-1 flex flex-col justify-center min-w-0">
+              <template v-if="seuilInfo">
+                <p
+                  class="text-xl font-bold"
+                  :class="seuilInfo.fait ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
+                >
+                  {{ seuilInfo.fait ? "Contrat fait" : "Contrat chuté" }}
+                </p>
+                <p
+                  class="text-sm font-semibold"
+                  :class="seuilInfo.fait ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
+                >
+                  de {{ seuilInfo.ecart.toFixed(1) }} point{{ seuilInfo.ecart > 1 ? "s" : "" }}
+                </p>
+                <p class="text-xs text-navy/50 dark:text-periwinkle/70 mt-1.5">
+                  {{ pour }} : {{ format1(points) }} / seuil
+                  {{ pour === "Attaque" ? seuilInfo.objectifAttaque : seuilInfo.seuilDefense }}
+                </p>
+              </template>
+              <p v-else class="text-sm text-navy/50 dark:text-periwinkle/70">
+                Fais tourner la roue pour régler les points, puis choisis le camp
+                pour voir si le contrat passe.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -464,9 +473,10 @@
 import { ref, reactive, computed } from "vue";
 import AppShell from "@/Components/AppShell.vue";
 import PlayerAvatar from "@/Components/PlayerAvatar.vue";
+import WheelPicker from "@/Components/WheelPicker.vue";
 import { useTarotData } from "@/composables/useTarotData";
 import { appendGame } from "@/services/sheets";
-import { computeRound, distributePoints } from "@/services/scoring";
+import { computeRound, distributePoints, POINTS_A_FAIRE } from "@/services/scoring";
 import { annonceStyle } from "@/services/avatars";
 import { getAppsScriptUrl, setAppsScriptUrl } from "@/config";
 
@@ -576,27 +586,24 @@ const toggleBout = (bout) => {
   }
 };
 
-const getColor = (value) => {
-  const redRange = 25;
-  const yellowRange = 41;
-  const greenRange = 56;
-  const cyanRange = 91;
+const format1 = (value) => (Number.isInteger(value) ? String(value) : value.toFixed(1));
 
-  if (value <= redRange) {
-    const ratio = value / redRange;
-    return `rgb(255, ${Math.round(ratio * 255)}, 0)`;
-  } else if (value <= yellowRange) {
-    const ratio = (value - redRange) / (yellowRange - redRange);
-    return `rgb(${Math.round((1 - ratio) * 255)}, 255, 0)`;
-  } else if (value <= greenRange) {
-    const ratio = (value - yellowRange) / (greenRange - yellowRange);
-    return `rgb(0, 255, ${Math.round(ratio * 255)})`;
-  } else if (value <= cyanRange) {
-    const ratio = (value - greenRange) / (cyanRange - greenRange);
-    return `rgb(${Math.round(ratio * 255)}, ${Math.round((1 - ratio) * 255)}, 255)`;
-  }
-  return "rgb(128, 0, 255)";
-};
+// Seuil et verdict en direct dès que le camp est choisi : l'objectif de
+// l'attaque dépend de ses bouts, le seuil de la défense en découle.
+const seuilInfo = computed(() => {
+  if (!pour.value) return null;
+  const bouts = selectedBouts.value.length;
+  const boutsAttaque = pour.value === "Attaque" ? bouts : 3 - bouts;
+  const objectifAttaque = POINTS_A_FAIRE[boutsAttaque] ?? 56;
+  const pointsAttaque = pour.value === "Attaque" ? points.value : 91 - points.value;
+  return {
+    boutsAttaque,
+    objectifAttaque,
+    seuilDefense: format1(91 - objectifAttaque + 0.5),
+    fait: pointsAttaque >= objectifAttaque,
+    ecart: Math.abs(pointsAttaque - objectifAttaque),
+  };
+});
 
 const missing = computed(() => {
   const list = [];
@@ -730,55 +737,8 @@ const submitGame = async () => {
   @apply ring-navy/50 dark:ring-white/50;
 }
 
-.custom-range {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
-  width: 100%;
-}
 
-.custom-range::-webkit-slider-runnable-track {
-  height: 16px;
-  border-radius: 8px;
-  background: linear-gradient(
-    to right,
-    var(--slider-color) 0%,
-    var(--slider-color) calc(var(--fill-percent) * 1%),
-    #9ca3af calc(var(--fill-percent) * 1%),
-    #9ca3af 100%
-  );
-}
 
-.custom-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 4px;
-  height: 24px;
-  background: #113b54;
-  border-radius: 2px;
-  margin-top: -4px;
-  position: relative;
-  z-index: 2;
-}
 
-.custom-range::-moz-range-track {
-  height: 16px;
-  border-radius: 8px;
-  background: linear-gradient(
-    to right,
-    var(--slider-color) 0%,
-    var(--slider-color) calc(var(--fill-percent) * 1%),
-    #9ca3af calc(var(--fill-percent) * 1%),
-    #9ca3af 100%
-  );
-}
 
-.custom-range::-moz-range-thumb {
-  width: 4px;
-  height: 24px;
-  background: #113b54;
-  border: none;
-  border-radius: 2px;
-}
 </style>

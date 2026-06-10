@@ -49,7 +49,7 @@
               <td class="py-2.5 px-3 text-right">Score</td>
               <td class="py-2.5 px-3 text-right hidden sm:table-cell">Parties</td>
               <td class="py-2.5 px-3 text-right hidden sm:table-cell">Vict.</td>
-              <td class="py-2.5 px-3 text-right">% vict.</td>
+              <td class="py-2.5 px-3 text-right hidden sm:table-cell">% vict.</td>
             </tr>
           </thead>
           <tbody>
@@ -77,7 +77,14 @@
               <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">
                 <div class="flex items-center space-x-3">
                   <PlayerAvatar :name="entry.name" size="sm" />
-                  <span>{{ entry.name }}</span>
+                  <div class="min-w-0">
+                    <div class="truncate">{{ entry.name }}</div>
+                    <!-- Sur mobile, le détail passe sous le nom -->
+                    <div class="sm:hidden text-xs font-normal text-navy/50 dark:text-periwinkle/70 whitespace-nowrap">
+                      {{ entry.participations }} parties ·
+                      {{ percent(entry.victoires, entry.participations) }} vict.
+                    </div>
+                  </div>
                 </div>
               </td>
               <td
@@ -92,7 +99,7 @@
               <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
                 {{ entry.victoires }}
               </td>
-              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
                 {{ percent(entry.victoires, entry.participations) }}
               </td>
             </tr>
