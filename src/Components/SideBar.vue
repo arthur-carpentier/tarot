@@ -142,6 +142,7 @@ import {
   MoonIcon,
   StarIcon,
   RefreshIcon,
+  FilmIcon,
 } from "@heroicons/vue/outline";
 import { SHEET_URL } from "@/config";
 import { useTheme } from "@/composables/useTheme";
@@ -154,6 +155,7 @@ const { refreshing, refresh } = useTarotData();
 const centeredMenuItems = [
   { title: "Parties", link: "/games", icon: ViewListIcon },
   { title: "Graphique", link: "/chart", icon: TrendingUpIcon },
+  { title: "Film de la saison", link: "/replay", icon: FilmIcon },
   { title: "Statistiques", link: "/stats", icon: ChartBarIcon },
   { title: "Carte résumée", link: "/season", icon: StarIcon },
 ];
