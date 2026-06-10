@@ -43,13 +43,13 @@
         <table class="w-full border-collapse">
           <thead>
             <tr class="text-left">
-              <td class="p-3">#</td>
-              <td class="p-3"></td>
-              <td class="p-3">Joueur</td>
-              <td class="p-3 text-right">Score</td>
-              <td class="p-3 text-right hidden sm:table-cell">Participations</td>
-              <td class="p-3 text-right hidden sm:table-cell">Victoires</td>
-              <td class="p-3 text-right">% victoire</td>
+              <td class="py-2.5 px-2">#</td>
+              <td class="py-2.5 px-1"></td>
+              <td class="py-2.5 px-3">Joueur</td>
+              <td class="py-2.5 px-3 text-right">Score</td>
+              <td class="py-2.5 px-3 text-right hidden sm:table-cell">Parties</td>
+              <td class="py-2.5 px-3 text-right hidden sm:table-cell">Vict.</td>
+              <td class="py-2.5 px-3 text-right">% vict.</td>
             </tr>
           </thead>
           <tbody>
@@ -59,9 +59,9 @@
               class="cursor-pointer"
               @click="$router.push(`/player/${encodeURIComponent(entry.name)}`)"
             >
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">{{ index + 1 }}</td>
+              <td class="py-2.5 px-2 border-t border-t-navy/10 dark:border-t-white/10">{{ index + 1 }}</td>
               <!-- Évolution du classement sur les 10 dernières parties -->
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-center">
+              <td class="py-2.5 px-1 border-t border-t-navy/10 dark:border-t-white/10 text-center text-sm">
                 <span
                   v-if="rankEvolution[entry.name] > 0"
                   class="text-pine dark:text-chartreuse font-bold"
@@ -74,25 +74,25 @@
                 >▼{{ -rankEvolution[entry.name] }}</span>
                 <span v-else class="text-navy/40 dark:text-periwinkle/50">=</span>
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">
                 <div class="flex items-center space-x-3">
                   <PlayerAvatar :name="entry.name" size="sm" />
                   <span>{{ entry.name }}</span>
                 </div>
               </td>
               <td
-                class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right font-bold"
+                class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right font-bold"
                 :class="entry.score >= 0 ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
               >
                 {{ entry.score.toFixed(1) }}
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
                 {{ entry.participations }}
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
                 {{ entry.victoires }}
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                 {{ percent(entry.victoires, entry.participations) }}
               </td>
             </tr>
@@ -106,34 +106,35 @@
         <table class="w-full border-collapse">
           <thead>
             <tr class="text-left">
-              <td class="p-3">Annonce</td>
-              <td class="p-3 text-right">Occurrences</td>
-              <td class="p-3 text-right hidden sm:table-cell">% des parties</td>
-              <td class="p-3 text-right hidden sm:table-cell">Réussites</td>
-              <td class="p-3 text-right">% réussite</td>
+              <td class="py-2.5 px-3">Annonce</td>
+              <td class="py-2.5 px-3 text-right">Jouées</td>
+              <td class="py-2.5 px-3 text-right">Réussies</td>
             </tr>
           </thead>
           <tbody>
             <tr v-for="stat in annonceStats" :key="stat.name">
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">
                 <span
-                  class="px-2 py-0.5 rounded ring-1 ring-navy/20 dark:ring-white/30 text-sm font-semibold"
+                  class="px-2 py-0.5 rounded ring-1 ring-navy/20 dark:ring-white/30 text-sm font-semibold whitespace-nowrap"
                   :style="annonceStyle(stat.name)"
                 >
                   {{ stat.name }}
                 </span>
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right whitespace-nowrap">
                 {{ stat.count }}
+                <span class="text-navy/50 dark:text-periwinkle/70 text-sm">
+                  ({{ percent(stat.count, games.length) }})
+                </span>
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
-                {{ percent(stat.count, games.length) }}
-              </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right hidden sm:table-cell">
-                {{ stat.wins }}
-              </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
-                {{ stat.count ? percent(stat.wins, stat.count) : "—" }}
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right whitespace-nowrap">
+                <template v-if="stat.count">
+                  {{ stat.wins }}
+                  <span class="text-navy/50 dark:text-periwinkle/70 text-sm">
+                    ({{ percent(stat.wins, stat.count) }})
+                  </span>
+                </template>
+                <template v-else>—</template>
               </td>
             </tr>
           </tbody>
@@ -257,47 +258,47 @@
           <table class="w-full border-collapse whitespace-nowrap">
             <thead>
               <tr class="text-left">
-                <td class="p-3">Joueur</td>
-                <td class="p-3 text-right">Parties</td>
-                <td class="p-3 text-right">Particip.</td>
-                <td class="p-3 text-right">Preneur</td>
-                <td class="p-3 text-right">Appelé</td>
-                <td class="p-3 text-right">Défense</td>
-                <td class="p-3 text-right">Vict. attaque</td>
-                <td class="p-3 text-right">Vict. défense</td>
-                <td class="p-3 text-right">Vict. global</td>
-                <td class="p-3 text-right">Max gain</td>
-                <td class="p-3 text-right">Max perte</td>
+                <td class="py-2.5 px-3">Joueur</td>
+                <td class="py-2.5 px-3 text-right">Parties</td>
+                <td class="py-2.5 px-3 text-right">Particip.</td>
+                <td class="py-2.5 px-3 text-right">Preneur</td>
+                <td class="py-2.5 px-3 text-right">Appelé</td>
+                <td class="py-2.5 px-3 text-right">Défense</td>
+                <td class="py-2.5 px-3 text-right">Vict. attaque</td>
+                <td class="py-2.5 px-3 text-right">Vict. défense</td>
+                <td class="py-2.5 px-3 text-right">Vict. global</td>
+                <td class="py-2.5 px-3 text-right">Max gain</td>
+                <td class="py-2.5 px-3 text-right">Max perte</td>
               </tr>
             </thead>
             <tbody>
               <tr v-for="stat in playerDetails" :key="stat.name">
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">
                   <div class="flex items-center space-x-2">
                     <PlayerAvatar :name="stat.name" size="xs" />
                     <span>{{ stat.name }}</span>
                   </div>
                 </td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">{{ stat.parties }}</td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">{{ stat.parties }}</td>
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                   {{ percent(stat.parties, games.length) }}
                 </td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">{{ stat.preneur }}</td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">{{ stat.appele }}</td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">{{ stat.defense }}</td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">{{ stat.preneur }}</td>
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">{{ stat.appele }}</td>
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">{{ stat.defense }}</td>
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                   {{ percent(stat.victoiresAttaque, stat.attaque) }}
                 </td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                   {{ percent(stat.victoiresDefense, stat.defense) }}
                 </td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right font-bold">
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right font-bold">
                   {{ percent(stat.victoires, stat.parties) }}
                 </td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right text-pine dark:text-chartreuse">
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right text-pine dark:text-chartreuse">
                   {{ stat.maxGain !== null ? "+" + stat.maxGain.toFixed(1) : "—" }}
                 </td>
-                <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right text-red-600 dark:text-red-400">
+                <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right text-red-600 dark:text-red-400">
                   {{ stat.maxPerte !== null ? stat.maxPerte.toFixed(1) : "—" }}
                 </td>
               </tr>

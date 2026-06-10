@@ -29,18 +29,18 @@
         <table class="w-full border-collapse">
           <thead>
             <tr class="text-left">
-              <td class="p-3">Annonce</td>
-              <td class="p-3 text-right">Score</td>
-              <td class="p-3 text-right">Multiplicateur</td>
+              <td class="py-2.5 px-3">Annonce</td>
+              <td class="py-2.5 px-3 text-right">Score</td>
+              <td class="py-2.5 px-3 text-right">Multiplicateur</td>
             </tr>
           </thead>
           <tbody>
             <tr v-for="annonce in annonces" :key="annonce.name">
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">{{ annonce.name }}</td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">{{ annonce.name }}</td>
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                 {{ annonce.score }}
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                 ×{{ annonce.multiplicateur }}
               </td>
             </tr>
@@ -53,14 +53,14 @@
         <table class="w-full border-collapse">
           <thead>
             <tr class="text-left">
-              <td class="p-3">Bonus</td>
-              <td class="p-3 text-right">Points</td>
+              <td class="py-2.5 px-3">Bonus</td>
+              <td class="py-2.5 px-3 text-right">Points</td>
             </tr>
           </thead>
           <tbody>
             <tr v-for="bonus in bonuses" :key="bonus.name">
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">{{ bonus.name }}</td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">{{ bonus.name }}</td>
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                 +{{ bonus.points }}
               </td>
             </tr>
@@ -73,16 +73,16 @@
         <table class="w-full border-collapse">
           <thead>
             <tr class="text-left">
-              <td class="p-3">Atouts</td>
-              <td class="p-3 text-right">Points</td>
+              <td class="py-2.5 px-3">Atouts</td>
+              <td class="py-2.5 px-3 text-right">Points</td>
             </tr>
           </thead>
           <tbody>
             <tr v-for="poignee in poignees" :key="poignee.atouts">
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">
                 {{ poignee.atouts }} atouts
               </td>
-              <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
+              <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-right">
                 +{{ poignee.points }}
               </td>
             </tr>

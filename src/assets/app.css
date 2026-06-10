@@ -30,8 +30,16 @@
     }
 }
 
+table {
+    @apply tabular-nums;
+}
+
 thead tr {
     @apply text-navy/60 dark:text-periwinkle/80;
+}
+
+thead td {
+    @apply text-xs uppercase tracking-wider font-semibold whitespace-nowrap;
 }
 
 tbody tr {

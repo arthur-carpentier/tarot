@@ -173,24 +173,24 @@
       <table class="w-full border-collapse">
         <thead>
           <tr class="bg-watergreen dark:bg-navy text-left">
-            <td class="p-3">N°</td>
-            <td class="p-3">Attaque</td>
-            <td class="p-3">Défense</td>
-            <td class="p-3 text-center">Annonce</td>
-            <td class="p-3 text-center">Bouts</td>
-            <td class="p-3 text-center">Bonus</td>
-            <td class="p-3 text-right">Points attaque</td>
-            <td class="p-3 text-center">Faite</td>
+            <td class="py-2.5 px-3">N°</td>
+            <td class="py-2.5 px-3">Attaque</td>
+            <td class="py-2.5 px-3">Défense</td>
+            <td class="py-2.5 px-3 text-center">Annonce</td>
+            <td class="py-2.5 px-3 text-center">Bouts</td>
+            <td class="py-2.5 px-3 text-center">Bonus</td>
+            <td class="py-2.5 px-3 text-right">Points attaque</td>
+            <td class="py-2.5 px-3 text-center">Faite</td>
           </tr>
         </thead>
         <tbody>
           <tr v-for="game in filteredGames" :key="game.numero">
-            <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 font-semibold">
+            <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 font-semibold">
               {{ game.numero }}
             </td>
 
             <!-- Attaque : preneur (rouge) + appelé (jaune) -->
-            <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
+            <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">
               <div class="flex space-x-2">
                 <PlayerAvatar
                   :name="game.preneur"
@@ -204,7 +204,7 @@
               </div>
             </td>
 
-            <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10">
+            <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10">
               <div class="flex space-x-2">
                 <PlayerAvatar
                   v-for="defenseur in game.defenseurs"
@@ -215,7 +215,7 @@
               </div>
             </td>
 
-            <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-center">
+            <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-center">
               <span
                 class="px-3 py-1 rounded-lg shadow whitespace-nowrap ring-1 ring-navy/20 dark:ring-white/30"
                 :style="annonceStyle(game.annonce)"
@@ -225,7 +225,7 @@
             </td>
 
             <!-- Bouts de l'attaque -->
-            <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 font-semibold text-center whitespace-nowrap">
+            <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 font-semibold text-center whitespace-nowrap">
               <i
                 v-for="n in 3"
                 :key="n"
@@ -234,7 +234,7 @@
               ></i>
             </td>
 
-            <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 text-center">
+            <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 text-center">
               <span
                 v-for="bonus in gameBonuses(game)"
                 :key="bonus"
@@ -244,12 +244,12 @@
               </span>
             </td>
 
-            <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 font-semibold text-right whitespace-nowrap">
+            <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 font-semibold text-right whitespace-nowrap">
               {{ game.pointsAttaque.toFixed(1) }} / {{ game.pointsAFaire }}
             </td>
 
             <!-- Écart (PRIS/CHUTÉ DE) -->
-            <td class="p-3 border-t border-t-navy/10 dark:border-t-white/10 font-semibold text-center">
+            <td class="py-2.5 px-3 border-t border-t-navy/10 dark:border-t-white/10 font-semibold text-center">
               <span
                 class="rounded-full px-3 py-2 whitespace-nowrap"
                 :class="game.fait ? 'bg-chartreuse text-navy' : 'bg-red-600 text-white'"
