@@ -52,6 +52,7 @@
         <span class="mx-1 hidden md:inline text-navy/30 dark:text-white/30">|</span>
         <select v-model="windowSize" class="filter-select">
           <option value="all">Toutes les parties</option>
+          <option v-if="todayStartIndex !== null" value="today">Aujourd'hui</option>
           <option value="50">50 dernières</option>
           <option value="20">20 dernières</option>
           <option value="10">10 dernières</option>
@@ -91,7 +92,14 @@ import { playerColor, playerInitials } from "@/services/avatars";
 
 Chart.register(...registerables);
 
-const { games, players, loading, error } = useTarotData();
+const { games, players, firstGameToday, loading, error } = useTarotData();
+
+// Indice de la première partie de la journée (marqueur Graphiques!R3)
+const todayStartIndex = computed(() => {
+  if (!firstGameToday.value) return null;
+  const index = games.value.findIndex((game) => game.numero >= firstGameToday.value);
+  return index >= 0 ? index : null;
+});
 const { isDark } = useTheme();
 
 const windowSize = ref("all");
@@ -117,7 +125,12 @@ const chartDataFormatted = computed(() => {
   if (games.value.length === 0) return { labels: [], datasets: [] };
 
   const all = games.value;
-  const start = windowSize.value === "all" ? 0 : Math.max(0, all.length - Number(windowSize.value));
+  const start =
+    windowSize.value === "all"
+      ? 0
+      : windowSize.value === "today"
+      ? todayStartIndex.value ?? 0
+      : Math.max(0, all.length - Number(windowSize.value));
   const window = all.slice(start);
   const previous = start > 0 ? all[start - 1] : null;
 

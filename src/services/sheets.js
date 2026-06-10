@@ -189,6 +189,18 @@ export async function fetchSeasonMeta() {
     }
 }
 
+// Onglet "Graphiques" : R3 contient le n° de la première partie de la
+// journée (écrit par le script quand on coche "première partie du jour").
+export async function fetchTodayMarker() {
+    try {
+        const table = await fetchGviz("Graphiques", "R3");
+        const value = Number(cellValue(table.rows?.[0], 0));
+        return Number.isFinite(value) && value > 0 ? value : null;
+    } catch {
+        return null;
+    }
+}
+
 // Appel du script Apps Script déployé en Web App.
 // Le body est envoyé en text/plain pour éviter le preflight CORS
 // (Apps Script ne répond pas aux requêtes OPTIONS).

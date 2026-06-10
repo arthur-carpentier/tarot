@@ -1,5 +1,5 @@
 import { ref, computed } from "vue";
-import { fetchRules, fetchGames } from "@/services/sheets";
+import { fetchRules, fetchGames, fetchTodayMarker } from "@/services/sheets";
 import { registerPlayers } from "@/services/avatars";
 
 // Store partagé entre les pages : la feuille n'est chargée qu'une fois,
@@ -13,6 +13,8 @@ const annonces = ref([]);
 const poignees = ref([]);
 const bonuses = ref([]);
 const games = ref([]);
+// n° de la première partie de la journée (Graphiques!R3)
+const firstGameToday = ref(null);
 const loading = ref(false); // aucune donnée à afficher pour l'instant
 const refreshing = ref(false); // rechargement (éventuellement en arrière-plan)
 const error = ref(null);
@@ -29,6 +31,7 @@ function applyData(data) {
     poignees.value = data.poignees;
     bonuses.value = data.bonuses;
     games.value = data.games;
+    firstGameToday.value = data.firstGameToday ?? null;
     loadedOnce = true;
 }
 
@@ -81,13 +84,18 @@ async function load() {
             loadingSteps.value[2].label = `${parties.games.length} parties chargées`;
             return parties;
         });
-        const [rules, parties] = await Promise.all([rulesPromise, gamesPromise]);
+        const [rules, parties, todayMarker] = await Promise.all([
+            rulesPromise,
+            gamesPromise,
+            fetchTodayMarker(),
+        ]);
         const data = {
             players: rules.players,
             annonces: rules.annonces,
             poignees: rules.poignees,
             bonuses: rules.bonuses,
             games: parties.games,
+            firstGameToday: todayMarker,
         };
         applyData(data);
         writeCache(data);
@@ -130,6 +138,7 @@ export function useTarotData() {
 
     return {
         players,
+        firstGameToday,
         annonces,
         poignees,
         bonuses,

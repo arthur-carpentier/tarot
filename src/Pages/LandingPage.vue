@@ -139,7 +139,11 @@
         </div>
         <div class="text-center py-2">
           <div class="text-4xl font-bold text-pine dark:text-chartreuse">{{ games.length }}</div>
-          <div class="text-navy/60 dark:text-periwinkle/80 text-sm mb-4">parties jouées</div>
+          <div class="text-navy/60 dark:text-periwinkle/80 text-sm mb-4">
+            parties jouées<template v-if="todayCount">
+              · dont {{ todayCount }} aujourd'hui</template
+            >
+          </div>
           <template v-if="standings.length">
             <div class="text-3xl mb-1">🥇</div>
             <div class="flex items-center justify-center gap-2">
@@ -163,9 +167,15 @@ import PlayerAvatar from "@/Components/PlayerAvatar.vue";
 import { useTarotData } from "@/composables/useTarotData";
 import { annonceStyle } from "@/services/avatars";
 
-const { games, standings, lastGame, loading, error } = useTarotData();
+const { games, standings, lastGame, firstGameToday, loading, error } = useTarotData();
 
 const textureUrl = `${import.meta.env.BASE_URL}images/card_table_texture.jpg`;
+
+const todayCount = computed(() =>
+  firstGameToday.value
+    ? games.value.filter((game) => game.numero >= firstGameToday.value).length
+    : 0
+);
 
 const lastGameScores = computed(() => {
   if (!lastGame.value) return [];

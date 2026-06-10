@@ -39,7 +39,10 @@
       <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 items-start">
       <!-- Classement -->
       <div class="xl:col-span-3 rounded-lg shadow-lg overflow-x-auto p-4 md:p-6 border border-navy/10 dark:border-white/10 bg-watergreen dark:bg-navy">
-        <h2 class="text-2xl font-bold mb-4">Classement</h2>
+        <h2 class="text-2xl font-bold mb-1">Classement</h2>
+        <p v-if="evolBase" class="text-xs text-navy/50 dark:text-periwinkle/70 mb-3">
+          ▲▼ : évolution {{ evolBase.label }}
+        </p>
         <table class="w-full border-collapse">
           <thead>
             <tr class="text-left">
@@ -65,12 +68,12 @@
                 <span
                   v-if="rankEvolution[entry.name] > 0"
                   class="text-pine dark:text-chartreuse font-bold"
-                  :title="`+${rankEvolution[entry.name]} place(s) sur les 10 dernières parties`"
+                  :title="`+${rankEvolution[entry.name]} place(s) ${evolBase?.label}`"
                 >▲{{ rankEvolution[entry.name] }}</span>
                 <span
                   v-else-if="rankEvolution[entry.name] < 0"
                   class="text-red-600 dark:text-red-400 font-bold"
-                  :title="`${rankEvolution[entry.name]} place(s) sur les 10 dernières parties`"
+                  :title="`${rankEvolution[entry.name]} place(s) ${evolBase?.label}`"
                 >▼{{ -rankEvolution[entry.name] }}</span>
                 <span v-else class="text-navy/40 dark:text-periwinkle/50">=</span>
               </td>
@@ -326,24 +329,42 @@ import { useTarotData } from "@/composables/useTarotData";
 import { annonceStyle } from "@/services/avatars";
 import { computeDuoStats, MIN_DUO_GAMES } from "@/services/duoStats";
 
-const { games, annonces, players, standings, loading, error } = useTarotData();
+const { games, annonces, players, standings, firstGameToday, loading, error } =
+  useTarotData();
 
 const percent = (value, total) => (total ? `${((value / total) * 100).toFixed(0)}%` : "—");
 
 const duos = computed(() => computeDuoStats(games.value));
 
-// Évolution du classement par rapport à il y a 10 parties (comme l'onglet
-// Graphiques de la feuille) : positif = a gagné des places.
+// Point de comparaison pour l'évolution du classement : la dernière partie
+// d'avant aujourd'hui si le marqueur Graphiques!R3 est posé et qu'au moins
+// une partie a été jouée depuis, sinon il y a 10 parties.
+const evolBase = computed(() => {
+  const list = games.value;
+  if (list.length < 2) return null;
+  if (firstGameToday.value) {
+    const index = list.findIndex((game) => game.numero >= firstGameToday.value);
+    if (index > 0 && index < list.length) {
+      return { game: list[index - 1], label: "depuis le début de la journée" };
+    }
+  }
+  return {
+    game: list[Math.max(0, list.length - 1 - 10)],
+    label: "sur les 10 dernières parties",
+  };
+});
+
+// Évolution du classement (positif = a gagné des places)
 const rankEvolution = computed(() => {
   const list = games.value;
-  if (list.length < 2) return {};
+  if (!evolBase.value) return {};
   const rankAt = (game) =>
     players.value
       .map((name) => ({ name, score: game.cumulativeScores[name] ?? 0 }))
       .sort((a, b) => b.score - a.score)
       .reduce((acc, entry, index) => ((acc[entry.name] = index + 1), acc), {});
   const now = rankAt(list[list.length - 1]);
-  const before = rankAt(list[Math.max(0, list.length - 1 - 10)]);
+  const before = rankAt(evolBase.value.game);
   const evolution = {};
   for (const name of players.value) evolution[name] = before[name] - now[name];
   return evolution;

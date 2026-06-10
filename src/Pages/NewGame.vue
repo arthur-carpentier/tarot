@@ -79,6 +79,27 @@
         </button>
       </div>
 
+      <!-- Marqueur de début de session : écrit le n° de la partie dans
+           Graphiques!R3 pour suivre l'évolution du jour sans gérer de date -->
+      <label
+        class="flex items-center gap-3 bg-watergreen dark:bg-navy rounded-lg shadow p-4 mb-4 cursor-pointer select-none"
+        :class="{ 'ring-2 ring-chartreuse': premierePartieDuJour }"
+      >
+        <input
+          type="checkbox"
+          v-model="premierePartieDuJour"
+          class="w-5 h-5 rounded border-navy/30 text-pine focus:ring-pine shrink-0"
+        />
+        <span class="text-xl">🌅</span>
+        <span class="flex-1">
+          <span class="font-semibold">Première partie de la journée</span>
+          <span class="block text-xs text-navy/60 dark:text-periwinkle/80">
+            Marque le début de la session : le graphique et le classement pourront
+            afficher l'évolution du jour.
+          </span>
+        </span>
+      </label>
+
       <div class="lg:grid lg:grid-cols-[1fr,21rem] lg:gap-6 lg:items-start">
       <form @submit.prevent="submitGame" class="space-y-4">
         <!-- 1. Annonce -->
@@ -489,6 +510,7 @@ const defense = ref([]);
 const selectedBouts = ref([]);
 const points = ref(41);
 const pour = ref(null);
+const premierePartieDuJour = ref(false);
 const submitting = ref(false);
 const submitError = ref(null);
 // Résultat du dernier ajout, avec les scores réellement calculés par la feuille
@@ -691,6 +713,7 @@ const submitGame = async () => {
       simplePoignee: toggles.simplePoignee,
       doublePoignee: toggles.doublePoignee,
       triplePoignee: toggles.triplePoignee,
+      premierePartieDuJour: premierePartieDuJour.value,
     });
     lastResult.value = {
       numero: result.numero || "?",
@@ -708,6 +731,7 @@ const submitGame = async () => {
     selectedBouts.value = [];
     points.value = 41;
     pour.value = null;
+    premierePartieDuJour.value = false;
     Object.keys(toggles).forEach((key) => (toggles[key] = false));
     refresh();
   } catch (error) {

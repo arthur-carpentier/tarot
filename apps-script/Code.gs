@@ -15,6 +15,10 @@
  */
 
 var SHEET_NAME = "Parties";
+// Cellule de l'onglet "Graphiques" contenant le n° de la première partie
+// de la journée (sert aux évolutions "du jour" dans la feuille et l'app).
+var GRAPH_SHEET = "Graphiques";
+var TODAY_CELL = "R3";
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
@@ -37,7 +41,7 @@ function doPost(e) {
 
 // Permet de tester que le déploiement répond (ouvrir l'URL dans un navigateur).
 function doGet() {
-  return json_({ ok: true, app: "tarot", sheet: SHEET_NAME, version: 2 });
+  return json_({ ok: true, app: "tarot", sheet: SHEET_NAME, version: 3 });
 }
 
 function addGame_(sheet, data) {
@@ -74,7 +78,18 @@ function addGame_(sheet, data) {
   ]]);
 
   SpreadsheetApp.flush();
-  return readBack_(sheet, row);
+  var result = readBack_(sheet, row);
+
+  // Première partie de la journée : enregistre son numéro dans Graphiques!R3
+  if (data.premierePartieDuJour) {
+    var graphSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(GRAPH_SHEET);
+    if (graphSheet) {
+      graphSheet.getRange(TODAY_CELL).setValue(result.numero);
+      SpreadsheetApp.flush();
+      result.premierePartieDuJour = result.numero;
+    }
+  }
+  return result;
 }
 
 // Relit la ligne après calcul des formules pour renvoyer les scores réels.
