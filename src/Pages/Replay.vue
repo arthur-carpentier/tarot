@@ -250,15 +250,22 @@ const raceOption = computed(() => {
   };
 });
 
-// Courbes : l'axe X s'arrête au curseur et grandit à chaque partie. Comme
-// les points existants glissent vers la gauche et qu'un point s'ajoute à
-// droite (animationDurationUpdate calé sur le tick), la courbe se trace au
-// fil de la lecture ; le badge à initiales (endLabel) suit son extrémité.
+// Courbes : axe X numérique figé sur toute la saison, données arrêtées au
+// curseur. L'échelle ne bougeant pas, chaque partie ajoute juste un point à
+// droite (animationDurationUpdate calé sur le tick) : la courbe se trace sur
+// un canevas stable sans reflow ; le badge à initiales (endLabel) suit le bout.
 const lineOption = computed(() => {
   const ink = inkColor.value;
   const badgeStroke = isDark.value ? "#113B54" : "#FFFFFF";
   const narrow = typeof window !== "undefined" && window.innerWidth < 768;
   const badge = narrow ? 20 : 26;
+
+  // Bornes figées sur toute la saison : l'axe ne se redimensionne jamais,
+  // donc ajouter un point n'oblige pas à ré-espacer toute la courbe (ce qui
+  // provoquait le « crop » horizontal). La ligne se contente de s'étendre.
+  const last = games.value.length - 1;
+  const minX = games.value.length ? games.value[0].numero : 0;
+  const maxX = games.value.length ? games.value[last].numero : 1;
 
   const series = activePlayers.value.map((name) => {
     const color = playerColor(name);
@@ -271,7 +278,7 @@ const lineOption = computed(() => {
       itemStyle: { color },
       data: games.value
         .slice(0, cursor.value)
-        .map((game) => game.cumulativeScores[name] ?? 0),
+        .map((game) => [game.numero, game.cumulativeScores[name] ?? 0]),
       endLabel: {
         show: true,
         formatter: () => playerInitials(name),
@@ -307,12 +314,17 @@ const lineOption = computed(() => {
       containLabel: true,
     },
     xAxis: {
-      type: "category",
-      boundaryGap: false,
-      data: games.value.slice(0, cursor.value).map((game) => `Partie ${game.numero}`),
+      type: "value",
+      min: minX,
+      max: maxX,
       axisLine: { lineStyle: { color: gridColor.value } },
       axisTick: { show: false },
-      axisLabel: { color: ink, fontFamily: "Poppins, sans-serif", fontSize: 10 },
+      axisLabel: {
+        color: ink,
+        fontFamily: "Poppins, sans-serif",
+        fontSize: 10,
+        formatter: (value) => `${Math.round(value)}`,
+      },
       splitLine: { show: false },
     },
     yAxis: {
