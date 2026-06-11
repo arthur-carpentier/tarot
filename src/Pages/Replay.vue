@@ -161,17 +161,26 @@ const activePlayers = computed(() =>
   )
 );
 
-// Score cumulé de chaque joueur à la position du curseur.
+// Joueurs ayant disputé au moins une partie jusqu'à la position du curseur :
+// le classement ne fait apparaître un joueur qu'une fois qu'il a joué.
+const playersAtCursor = computed(() => {
+  const window = games.value.slice(0, cursor.value);
+  return activePlayers.value.filter((name) =>
+    window.some((game) => game.scores[name] !== undefined)
+  );
+});
+
+// Score cumulé de chaque joueur (déjà entré en jeu) à la position du curseur.
 const scoresAtCursor = computed(() => {
   const game = cursor.value > 0 ? games.value[cursor.value - 1] : null;
-  return activePlayers.value.map((name) => ({
+  return playersAtCursor.value.map((name) => ({
     name,
     value: game ? game.cumulativeScores[name] ?? 0 : 0,
   }));
 });
 
 const raceHeight = computed(
-  () => `${Math.max(280, activePlayers.value.length * 48 + 48)}px`
+  () => `${Math.max(280, playersAtCursor.value.length * 48 + 48)}px`
 );
 
 const inkColor = computed(() => (isDark.value ? "#FFFFFF" : "#113B54"));
@@ -241,9 +250,10 @@ const raceOption = computed(() => {
   };
 });
 
-// Courbes : l'axe couvre toute la saison dès le départ, les données
-// s'arrêtent au curseur — la ligne « se dessine » pendant la lecture et
-// le badge à initiales (endLabel) suit le bout de chaque courbe.
+// Courbes : l'axe X s'arrête au curseur et grandit à chaque partie. Comme
+// les points existants glissent vers la gauche et qu'un point s'ajoute à
+// droite (animationDurationUpdate calé sur le tick), la courbe se trace au
+// fil de la lecture ; le badge à initiales (endLabel) suit son extrémité.
 const lineOption = computed(() => {
   const ink = inkColor.value;
   const badgeStroke = isDark.value ? "#113B54" : "#FFFFFF";
@@ -299,7 +309,7 @@ const lineOption = computed(() => {
     xAxis: {
       type: "category",
       boundaryGap: false,
-      data: games.value.map((game) => `Partie ${game.numero}`),
+      data: games.value.slice(0, cursor.value).map((game) => `Partie ${game.numero}`),
       axisLine: { lineStyle: { color: gridColor.value } },
       axisTick: { show: false },
       axisLabel: { color: ink, fontFamily: "Poppins, sans-serif", fontSize: 10 },
