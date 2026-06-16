@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
 import LandingPage from "@/Pages/LandingPage.vue";
+import Today from "@/Pages/Today.vue";
 import Games from "@/Pages/Games.vue";
 import NewGame from "@/Pages/NewGame.vue";
 import ChartPage from "@/Pages/Chart.vue";
@@ -16,6 +17,7 @@ export default createRouter({
     history: createWebHashHistory(),
     routes: [
         { path: "/", component: LandingPage },
+        { path: "/today", component: Today },
         { path: "/games", component: Games },
         { path: "/new-game", component: NewGame },
         { path: "/chart", component: ChartPage },

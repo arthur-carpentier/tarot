@@ -143,6 +143,7 @@ import {
   StarIcon,
   RefreshIcon,
   FilmIcon,
+  CalendarIcon,
 } from "@heroicons/vue/outline";
 import { SHEET_URL } from "@/config";
 import { useTheme } from "@/composables/useTheme";
@@ -153,6 +154,7 @@ const { isDark, toggle } = useTheme();
 const { refreshing, refresh } = useTarotData();
 
 const centeredMenuItems = [
+  { title: "Aujourd'hui", link: "/today", icon: CalendarIcon },
   { title: "Parties", link: "/games", icon: ViewListIcon },
   { title: "Graphique", link: "/chart", icon: TrendingUpIcon },
   { title: "Film de la saison", link: "/replay", icon: FilmIcon },

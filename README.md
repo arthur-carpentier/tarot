@@ -29,6 +29,10 @@ comme seule base de données.
 
 ## Pages
 
+- **Partie d'aujourd'hui** : tableau de bord de la soirée en cours — classement
+  du jour (places et points gagnés/perdus, V/D et récap des annonces par
+  joueur), temps forts, graphe rebasé à zéro et liste des manches du jour. La
+  journée démarre à la manche cochée « Première partie de la journée ».
 - **Parties** : liste des manches avec attaque/défense, annonce, bouts, points.
 - **Nouvelle partie** : formulaire de saisie avec prévisualisation des points
   (mêmes formules que la feuille), enregistrement dans le Sheet.
