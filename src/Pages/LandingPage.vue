@@ -21,6 +21,14 @@
             <i class="fa-solid fa-play mr-2"></i>Nouvelle partie
           </router-link>
           <router-link
+            v-if="todayCount"
+            to="/today"
+            class="px-6 py-3 bg-pine text-white font-semibold rounded-lg shadow-lg hover:brightness-110 transition"
+          >
+            <i class="fa-solid fa-calendar-day mr-2"></i>Partie d'aujourd'hui
+            <span class="ml-1 px-2 py-0.5 rounded-full bg-white/20 text-sm">{{ todayCount }}</span>
+          </router-link>
+          <router-link
             to="/games"
             class="px-6 py-3 bg-white dark:bg-white/10 text-navy dark:text-white font-semibold rounded-lg shadow-lg ring-1 ring-navy/10 dark:ring-white/20 hover:bg-periwinkle/40 dark:hover:bg-white/20 transition"
           >
