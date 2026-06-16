@@ -160,9 +160,10 @@
                 type="button"
                 @click="selectPreneur(player)"
                 class="player-chip"
-                :class="preneur === player ? 'bg-red-600 !text-white ring-red-600' : ''"
+                :class="preneur === player ? 'player-chip-on bg-red-600 !text-white !ring-red-700 dark:!ring-red-300' : ''"
               >
                 <PlayerAvatar :name="player" size="xs" />{{ player }}
+                <i v-if="preneur === player" class="fa-solid fa-check ml-0.5"></i>
               </button>
             </div>
 
@@ -180,9 +181,10 @@
                 type="button"
                 @click="selectAppele(player)"
                 class="player-chip"
-                :class="appele === player ? 'bg-yellow-500 !text-navy ring-yellow-500' : ''"
+                :class="appele === player ? 'player-chip-on bg-yellow-500 !text-navy !ring-yellow-600' : ''"
               >
                 <PlayerAvatar :name="player" size="xs" />{{ player }}
+                <i v-if="appele === player" class="fa-solid fa-check ml-0.5"></i>
               </button>
             </div>
           </template>
@@ -206,9 +208,10 @@
               type="button"
               @click="toggleDefense(player)"
               class="player-chip"
-              :class="defense.includes(player) ? 'bg-blue-600 !text-white ring-blue-600' : ''"
+              :class="defense.includes(player) ? 'player-chip-on bg-blue-600 !text-white !ring-blue-700 dark:!ring-blue-300' : ''"
             >
               <PlayerAvatar :name="player" size="xs" />{{ player }}
+              <i v-if="defense.includes(player)" class="fa-solid fa-check ml-0.5"></i>
             </button>
           </div>
         </section>
@@ -349,36 +352,20 @@
           </div>
         </section>
 
-        <!-- Prévisualisation des points (mobile : dans le flux du formulaire) -->
-        <section
-          v-if="preview"
-          class="lg:hidden bg-watergreen dark:bg-navy rounded-lg shadow p-4"
-        >
-          <h2 class="text-lg font-semibold mb-1">Prévisualisation</h2>
-          <p
-            class="text-sm mb-3 font-semibold"
-            :class="preview.fait ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
-          >
-            {{ preview.fait ? "Contrat fait" : "Contrat chuté" }} de
-            {{ Math.abs(preview.pointsAttaque - preview.pointsAFaire).toFixed(1) }}
-            ({{ preview.pointsAttaque.toFixed(1) }} / {{ preview.pointsAFaire }})
-          </p>
-          <ul class="space-y-2">
-            <li
-              v-for="entry in preview.entries"
-              :key="entry.name"
-              class="flex items-center gap-3"
-            >
-              <PlayerAvatar :name="entry.name" size="sm" :class="`outline outline-2 ${entry.outline}`" />
-              <span class="flex-1">{{ entry.name }}</span>
-              <span
-                class="font-bold"
-                :class="entry.points >= 0 ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
-              >
-                {{ (entry.points >= 0 ? "+" : "") + entry.points.toFixed(1) }} pts
-              </span>
-            </li>
-          </ul>
+        <!-- Récapitulatif (mobile : dans le flux du formulaire, toujours visible) -->
+        <section class="lg:hidden bg-watergreen dark:bg-navy rounded-lg shadow p-4">
+          <GameRecap
+            :annonce="selectedAnnonceObj"
+            :preneur="preneur"
+            :appele="appele"
+            :defense="defense"
+            :pour="pour"
+            :bouts="selectedBouts"
+            :points="points"
+            :bonus-labels="activeBonusLabels"
+            :preview="preview"
+            :missing="missing"
+          />
         </section>
 
         <p
@@ -392,42 +379,18 @@
       <!-- Desktop : récapitulatif collant à droite -->
       <aside class="hidden lg:block sticky top-6 space-y-4">
         <div class="bg-watergreen dark:bg-navy rounded-lg shadow p-4">
-          <h2 class="text-lg font-semibold mb-2">Récapitulatif</h2>
-          <template v-if="missing.length">
-            <p class="text-sm text-navy/60 dark:text-periwinkle/80">
-              Reste à choisir : {{ missing.join(", ") }}.
-            </p>
-          </template>
-          <template v-else-if="preview">
-            <p
-              class="text-sm mb-3 font-semibold"
-              :class="preview.fait ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
-            >
-              {{ preview.fait ? "Contrat fait" : "Contrat chuté" }} de
-              {{ Math.abs(preview.pointsAttaque - preview.pointsAFaire).toFixed(1) }}
-              ({{ preview.pointsAttaque.toFixed(1) }} / {{ preview.pointsAFaire }})
-            </p>
-            <ul class="space-y-2">
-              <li
-                v-for="entry in preview.entries"
-                :key="entry.name"
-                class="flex items-center gap-3"
-              >
-                <PlayerAvatar
-                  :name="entry.name"
-                  size="sm"
-                  :class="`outline outline-2 ${entry.outline}`"
-                />
-                <span class="flex-1">{{ entry.name }}</span>
-                <span
-                  class="font-bold"
-                  :class="entry.points >= 0 ? 'text-pine dark:text-chartreuse' : 'text-red-600 dark:text-red-400'"
-                >
-                  {{ (entry.points >= 0 ? "+" : "") + entry.points.toFixed(1) }} pts
-                </span>
-              </li>
-            </ul>
-          </template>
+          <GameRecap
+            :annonce="selectedAnnonceObj"
+            :preneur="preneur"
+            :appele="appele"
+            :defense="defense"
+            :pour="pour"
+            :bouts="selectedBouts"
+            :points="points"
+            :bonus-labels="activeBonusLabels"
+            :preview="preview"
+            :missing="missing"
+          />
           <button
             @click="submitGame"
             class="mt-4 w-full bg-chartreuse text-navy px-6 py-2.5 rounded-lg font-bold hover:brightness-95 transition"
@@ -496,6 +459,7 @@ import { ref, reactive, computed } from "vue";
 import AppShell from "@/Components/AppShell.vue";
 import PlayerAvatar from "@/Components/PlayerAvatar.vue";
 import WheelPicker from "@/Components/WheelPicker.vue";
+import GameRecap from "@/Components/GameRecap.vue";
 import { useTarotData } from "@/composables/useTarotData";
 import { appendGame } from "@/services/sheets";
 import { computeRound, distributePoints, POINTS_A_FAIRE } from "@/services/scoring";
@@ -640,6 +604,23 @@ const missing = computed(() => {
 
 const isDisabled = computed(() => missing.value.length > 0);
 
+// Annonce sélectionnée (objet complet) et libellés des bonus actifs : alimentent
+// le récapitulatif en direct, indépendamment du calcul des points.
+const selectedAnnonceObj = computed(
+  () => annonces.value.find((a) => a.name === selectedAnnonce.value) || null
+);
+
+const activeBonusLabels = computed(() => {
+  const labels = [];
+  bonusToggles.value.forEach((b) => {
+    if (toggles[b.key]) labels.push(b.label);
+  });
+  poigneeToggles.value.forEach((p) => {
+    if (toggles[p.key]) labels.push(p.label);
+  });
+  return labels;
+});
+
 const bonusPoints = computed(() => {
   let total = 0;
   if (toggles.petitAuBout) total += bonusToggles.value[0].points;
@@ -753,6 +734,11 @@ const submitGame = async () => {
 }
 .player-chip:hover {
   @apply ring-navy/50 dark:ring-white/50;
+}
+/* État sélectionné : anneau épais détaché du fond + ombre + léger zoom,
+   pour que le joueur retenu (preneur / appelé / défense) saute aux yeux. */
+.player-chip-on {
+  @apply ring-2 ring-offset-2 ring-offset-watergreen dark:ring-offset-navy shadow-md font-bold scale-[1.04];
 }
 
 .bonus-chip {
