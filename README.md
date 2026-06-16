@@ -34,8 +34,10 @@ comme seule base de données.
   joueur), temps forts, graphe rebasé à zéro et liste des manches du jour. La
   journée démarre à la manche cochée « Première partie de la journée ».
 - **Parties** : liste des manches avec attaque/défense, annonce, bouts, points.
-- **Nouvelle partie** : formulaire de saisie avec prévisualisation des points
-  (mêmes formules que la feuille), enregistrement dans le Sheet.
+- **Nouvelle partie** : formulaire de saisie avec récapitulatif en direct (toutes
+  les sélections, avec placeholders pour ce qui reste à choisir) et
+  prévisualisation des points (mêmes formules que la feuille), enregistrement
+  dans le Sheet.
 - **Graphique** : évolution des scores cumulés par joueur.
 - **Statistiques** : classement, stats par annonce, attaque vs défense.
 - **Joueurs / Règles** : lecture seule depuis l'onglet `Données`.
