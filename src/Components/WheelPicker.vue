@@ -1,5 +1,9 @@
 <template>
-  <div class="relative select-none" :style="{ height: height + 'px' }">
+  <div
+    class="relative select-none"
+    :class="{ 'opacity-50 pointer-events-none': disabled }"
+    :style="{ height: height + 'px' }"
+  >
     <!-- Bande de sélection centrale -->
     <div
       class="absolute inset-x-0 pointer-events-none rounded-lg bg-chartreuse/25 ring-1 ring-chartreuse z-0"
@@ -35,6 +39,7 @@ const props = defineProps({
   min: { type: Number, default: 0 },
   max: { type: Number, default: 91 },
   step: { type: Number, default: 0.5 },
+  disabled: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -73,6 +78,7 @@ const scrollToValue = (value, smooth) => {
 onMounted(() => scrollToValue(props.modelValue, false));
 
 const onScroll = () => {
+  if (props.disabled) return;
   clearTimeout(scrollTimer);
   scrollTimer = setTimeout(() => {
     const index = Math.min(
@@ -85,6 +91,7 @@ const onScroll = () => {
 };
 
 const select = (value) => {
+  if (props.disabled) return;
   emit("update:modelValue", value);
   scrollToValue(value, true);
 };

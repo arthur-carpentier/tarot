@@ -101,6 +101,28 @@
         </span>
       </label>
 
+      <!-- Enculette : le preneur s'appelle lui-même et chute automatiquement
+           une Garde de 10 points (26 pts, 3 bouts) -->
+      <label
+        class="flex items-center gap-3 bg-watergreen dark:bg-navy rounded-lg shadow p-4 mb-4 cursor-pointer select-none"
+        :class="{ 'ring-2 ring-chartreuse': enculette }"
+      >
+        <input
+          type="checkbox"
+          v-model="enculette"
+          class="w-5 h-5 rounded border-navy/30 text-pine focus:ring-pine shrink-0"
+        />
+        <span class="text-xl">😈</span>
+        <span class="flex-1">
+          <span class="font-semibold">Enculette</span>
+          <span class="block text-xs text-navy/60 dark:text-periwinkle/80">
+            Le preneur s'appelle lui-même et chute automatiquement une Garde de 10
+            points (26 pts, 3 bouts pour l'attaque) : annonce, camp, bouts et points
+            sont verrouillés tant que la case est cochée.
+          </span>
+        </span>
+      </label>
+
       <div class="lg:grid lg:grid-cols-[1fr,21rem] lg:gap-6 lg:items-start">
       <form @submit.prevent="submitGame" class="space-y-4">
         <!-- 1. Annonce -->
@@ -125,11 +147,13 @@
               v-for="annonce in annonces"
               :key="annonce.name"
               type="button"
-              @click="selectedAnnonce = selectedAnnonce === annonce.name ? null : annonce.name"
+              :disabled="enculette"
+              @click="!enculette && (selectedAnnonce = selectedAnnonce === annonce.name ? null : annonce.name)"
               class="px-3 py-2.5 text-center font-semibold rounded-lg transition-all duration-150 ring-1 ring-navy/10 dark:ring-white/10"
               :class="{
                 'opacity-40 grayscale': selectedAnnonce && selectedAnnonce !== annonce.name,
                 'ring-2 !ring-navy dark:!ring-chartreuse scale-[1.02]': selectedAnnonce === annonce.name,
+                'cursor-not-allowed': enculette,
               }"
               :style="annonceStyle(annonce.name)"
             >
@@ -155,7 +179,7 @@
             </p>
             <div class="flex flex-wrap gap-2 mb-4">
               <button
-                v-for="player in players"
+                v-for="player in sortedPlayers"
                 :key="player"
                 type="button"
                 @click="selectPreneur(player)"
@@ -173,15 +197,22 @@
               <span v-else class="text-navy/50 dark:text-periwinkle/70 font-normal">
                 (le preneur peut s'appeler lui-même)</span
               >
+              <span v-if="enculette" class="text-navy/50 dark:text-periwinkle/70 font-normal">
+                (enculette : le preneur s'appelle lui-même)</span
+              >
             </p>
             <div class="flex flex-wrap gap-2">
               <button
-                v-for="player in players"
+                v-for="player in sortedPlayers"
                 :key="player"
                 type="button"
-                @click="selectAppele(player)"
+                :disabled="enculette"
+                @click="!enculette && selectAppele(player)"
                 class="player-chip"
-                :class="appele === player ? 'player-chip-on bg-yellow-500 !text-navy !ring-yellow-600' : ''"
+                :class="[
+                  appele === player ? 'player-chip-on bg-yellow-500 !text-navy !ring-yellow-600' : '',
+                  enculette ? 'cursor-not-allowed' : '',
+                ]"
               >
                 <PlayerAvatar :name="player" size="xs" />{{ player }}
                 <i v-if="appele === player" class="fa-solid fa-check ml-0.5"></i>
@@ -203,7 +234,7 @@
           </div>
           <div v-else class="flex flex-wrap gap-2">
             <button
-              v-for="player in players"
+              v-for="player in sortedPlayers"
               :key="player"
               type="button"
               @click="toggleDefense(player)"
@@ -226,22 +257,26 @@
           <div class="grid grid-cols-2 gap-2 mb-4">
             <button
               type="button"
-              @click="pour = pour === 'Attaque' ? null : 'Attaque'"
+              :disabled="enculette"
+              @click="!enculette && (pour = pour === 'Attaque' ? null : 'Attaque')"
               class="px-3 py-2.5 rounded-lg font-semibold text-white bg-red-600 transition-all ring-1 ring-navy/10 dark:ring-white/10"
               :class="{
                 'opacity-40 grayscale': pour && pour !== 'Attaque',
                 'ring-2 !ring-navy dark:!ring-chartreuse': pour === 'Attaque',
+                'cursor-not-allowed': enculette,
               }"
             >
               Attaque
             </button>
             <button
               type="button"
-              @click="pour = pour === 'Défense' ? null : 'Défense'"
+              :disabled="enculette"
+              @click="!enculette && (pour = pour === 'Défense' ? null : 'Défense')"
               class="px-3 py-2.5 rounded-lg font-semibold text-white bg-blue-600 transition-all ring-1 ring-navy/10 dark:ring-white/10"
               :class="{
                 'opacity-40 grayscale': pour && pour !== 'Défense',
                 'ring-2 !ring-navy dark:!ring-chartreuse': pour === 'Défense',
+                'cursor-not-allowed': enculette,
               }"
             >
               Défense
@@ -256,13 +291,15 @@
               v-for="bout in bouts"
               :key="bout"
               type="button"
-              @click="toggleBout(bout)"
+              :disabled="enculette"
+              @click="!enculette && toggleBout(bout)"
               class="px-2 py-2.5 rounded-lg font-semibold transition-all text-sm sm:text-base ring-1 ring-navy/10 dark:ring-white/10"
-              :class="
+              :class="[
                 selectedBouts.includes(bout)
                   ? 'bg-pine text-white ring-2 !ring-navy dark:!ring-chartreuse'
-                  : 'bg-white dark:bg-white/10 opacity-70 hover:opacity-100'
-              "
+                  : 'bg-white dark:bg-white/10 opacity-70 hover:opacity-100',
+                enculette ? 'cursor-not-allowed' : '',
+              ]"
             >
               {{ bout }}
             </button>
@@ -288,6 +325,7 @@
           <div class="flex items-stretch gap-4">
             <WheelPicker
               v-model="points"
+              :disabled="enculette"
               class="w-24 shrink-0 bg-white dark:bg-white/10 rounded-lg ring-1 ring-navy/10 dark:ring-white/10"
             />
             <div class="flex-1 flex flex-col justify-center min-w-0">
@@ -337,7 +375,7 @@
             </button>
           </div>
           <p class="text-xs text-navy/50 dark:text-periwinkle/70 mb-2">Poignée (une seule) :</p>
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2 mb-2">
             <button
               v-for="poignee in poigneeToggles"
               :key="poignee.key"
@@ -348,6 +386,20 @@
             >
               {{ poignee.label }}
               <span class="opacity-70 text-xs">+{{ poignee.points }}</span>
+            </button>
+          </div>
+          <p class="text-xs text-navy/50 dark:text-periwinkle/70 mb-2">Chelem (un seul) :</p>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="chelem in chelemToggles"
+              :key="chelem.key"
+              type="button"
+              @click="toggleChelem(chelem.key)"
+              class="bonus-chip"
+              :class="toggles[chelem.key] ? 'bg-pine !text-white ring-2 !ring-navy dark:!ring-chartreuse' : ''"
+            >
+              {{ chelem.label }}
+              <span class="opacity-70 text-xs">+{{ chelem.points }}</span>
             </button>
           </div>
         </section>
@@ -455,7 +507,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 import AppShell from "@/Components/AppShell.vue";
 import PlayerAvatar from "@/Components/PlayerAvatar.vue";
 import WheelPicker from "@/Components/WheelPicker.vue";
@@ -468,6 +520,10 @@ import { getAppsScriptUrl, setAppsScriptUrl } from "@/config";
 
 const { players, annonces, bonuses, poignees, loading, refresh } = useTarotData();
 
+// Liste des joueurs triée par ordre alphabétique pour la sélection
+// (l'ordre d'origine, lui, reste utilisé ailleurs pour l'attribution des couleurs).
+const sortedPlayers = computed(() => [...players.value].sort((a, b) => a.localeCompare(b, "fr")));
+
 const selectedAnnonce = ref(null);
 const preneur = ref(null);
 const appele = ref(null);
@@ -476,6 +532,7 @@ const selectedBouts = ref([]);
 const points = ref(41);
 const pour = ref(null);
 const premierePartieDuJour = ref(false);
+const enculette = ref(false);
 const submitting = ref(false);
 const submitError = ref(null);
 // Résultat du dernier ajout, avec les scores réellement calculés par la feuille
@@ -495,6 +552,9 @@ const toggles = reactive({
   simplePoignee: false,
   doublePoignee: false,
   triplePoignee: false,
+  // AA..AB de la feuille "Parties"
+  petitChelem: false,
+  grandChelem: false,
 });
 
 const findBonusPoints = (label, fallback) =>
@@ -532,6 +592,19 @@ const togglePoignee = (key) => {
   toggles.simplePoignee = false;
   toggles.doublePoignee = false;
   toggles.triplePoignee = false;
+  toggles[key] = !wasActive;
+};
+
+const chelemToggles = computed(() => [
+  { key: "petitChelem", label: "Petit chelem", points: findBonusPoints("petit chelem", 200) },
+  { key: "grandChelem", label: "Grand chelem", points: findBonusPoints("grand chelem", 400) },
+]);
+
+// Un seul chelem à la fois
+const toggleChelem = (key) => {
+  const wasActive = toggles[key];
+  toggles.petitChelem = false;
+  toggles.grandChelem = false;
   toggles[key] = !wasActive;
 };
 
@@ -618,6 +691,9 @@ const activeBonusLabels = computed(() => {
   poigneeToggles.value.forEach((p) => {
     if (toggles[p.key]) labels.push(p.label);
   });
+  chelemToggles.value.forEach((c) => {
+    if (toggles[c.key]) labels.push(c.label);
+  });
   return labels;
 });
 
@@ -629,7 +705,27 @@ const bonusPoints = computed(() => {
   poigneeToggles.value.forEach((p) => {
     if (toggles[p.key]) total += p.points;
   });
+  chelemToggles.value.forEach((c) => {
+    if (toggles[c.key]) total += c.points;
+  });
   return total;
+});
+
+// Enculette : le preneur s'appelle lui-même et chute automatiquement une
+// Garde de 10 points (26 pts, 3 bouts pour l'attaque) — pts et bouts
+// deviennent alors fixes (voir verrouillage des contrôles dans le template).
+watch(enculette, (active) => {
+  if (!active) return;
+  const garde = annonces.value.find((a) => a.name === "Garde");
+  selectedAnnonce.value = garde ? garde.name : "Garde";
+  pour.value = "Attaque";
+  selectedBouts.value = [...bouts];
+  points.value = 26;
+  appele.value = preneur.value;
+});
+
+watch(preneur, (player) => {
+  if (enculette.value) appele.value = player;
 });
 
 const preview = computed(() => {
@@ -695,6 +791,8 @@ const submitGame = async () => {
       simplePoignee: toggles.simplePoignee,
       doublePoignee: toggles.doublePoignee,
       triplePoignee: toggles.triplePoignee,
+      petitChelem: toggles.petitChelem,
+      grandChelem: toggles.grandChelem,
       premierePartieDuJour: premierePartieDuJour.value,
     });
     lastResult.value = {
@@ -714,6 +812,7 @@ const submitGame = async () => {
     points.value = 41;
     pour.value = null;
     premierePartieDuJour.value = false;
+    enculette.value = false;
     Object.keys(toggles).forEach((key) => (toggles[key] = false));
     refresh();
   } catch (error) {

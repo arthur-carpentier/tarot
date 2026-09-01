@@ -21,6 +21,8 @@ const COL = {
     MULTIPLICATEUR: 23, // X
     POINTS_PERDUS_DEFENSEUR: 24, // Y
     PRIS_CHUTE_DE: 25, // Z
+    PETIT_CHELEM: 26, // AA : bonus petit chelem (+200, saisi)
+    GRAND_CHELEM: 27, // AB : bonus grand chelem (+400, saisi)
     SCORES_START: 30, // AE..AQ : points de la manche par joueur (en-tête = nom)
     SCORES_END: 42,
     CUMUL_OFFSET: 26, // BE..BQ : score cumulé, aligné sur AE..AQ
@@ -156,6 +158,8 @@ export async function fetchGames() {
                 simplePoignee: cellValue(row, COL.PETIT_AU_BOUT + 3) === true,
                 doublePoignee: cellValue(row, COL.PETIT_AU_BOUT + 4) === true,
                 triplePoignee: cellValue(row, COL.PETIT_AU_BOUT + 5) === true,
+                petitChelem: cellValue(row, COL.PETIT_CHELEM) === true,
+                grandChelem: cellValue(row, COL.GRAND_CHELEM) === true,
                 pointsBonus: Number(cellValue(row, COL.POINTS_BONUS)) || 0,
                 multiplicateur: Number(cellValue(row, COL.MULTIPLICATEUR)) || 1,
                 pointsPerdusDefenseur: Number(cellValue(row, COL.POINTS_PERDUS_DEFENSEUR)),

@@ -33,8 +33,13 @@ Après modification du code dans l'éditeur Apps Script :
 
 - L'application envoie le JSON en `Content-Type: text/plain` pour éviter la
   requête preflight CORS, qu'Apps Script ne gère pas.
-- Le script écrit uniquement les colonnes de saisie (B–K et Q–V) sur la
-  première ligne libre de l'onglet `Parties`. Les formules (déjà remplies
+- Le script écrit uniquement les colonnes de saisie (B–K, Q–V et AA–AB) sur
+  la première ligne libre de l'onglet `Parties`. Les formules (déjà remplies
   jusqu'à la ligne 1000) calculent le reste : scores, cumuls, classements.
 - Un verrou (`LockService`) évite que deux ajouts simultanés écrivent sur la
   même ligne.
+- Colonnes AA/AB : bonus "petit chelem" (+200) et "grand chelem" (+400).
+  Elles sont bien enregistrées par le script, mais la formule de la colonne W
+  (`POINTS_BONUS`) de la feuille doit être complétée à la main pour les
+  prendre en compte dans le calcul des scores (voir le commentaire en tête de
+  `Code.gs`).

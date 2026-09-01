@@ -2,9 +2,17 @@
  * Web App Google Apps Script permettant à l'application (GitHub Pages)
  * d'ajouter et d'annuler des parties dans l'onglet "Parties" du Google Sheet.
  *
- * Le script écrit uniquement les colonnes de saisie (B à K et Q à V) :
- * toutes les autres colonnes sont des formules déjà remplies dans la
+ * Le script écrit uniquement les colonnes de saisie (B à K, Q à V, et AA à
+ * AB) : toutes les autres colonnes sont des formules déjà remplies dans la
  * feuille, les scores se recalculent donc automatiquement.
+ *
+ * IMPORTANT (bonus chelem, colonnes AA/AB) : la formule de la colonne W
+ * (POINTS_BONUS) doit être mise à jour manuellement dans la feuille pour
+ * ajouter 200 points si AA est coché (petit chelem) et 400 points si AB est
+ * coché (grand chelem), par ex. en ajoutant `+ SI(AA2;200;0) + SI(AB2;400;0)`
+ * à la formule existante. Sans cette mise à jour, les cases "petit/grand
+ * chelem" cochées dans l'application sont bien enregistrées en colonnes
+ * AA/AB mais n'impactent pas encore les scores calculés par la feuille.
  *
  * Actions (champ "action" du JSON envoyé en POST) :
  *  - "add" (défaut) : ajoute une partie sur la première ligne libre et
@@ -90,6 +98,12 @@ function addGame_(sheet, data) {
     Boolean(data.triplePoignee),
   ]]);
 
+  // Colonnes AA..AB : bonus chelem
+  sheet.getRange(row, 27, 1, 2).setValues([[
+    Boolean(data.petitChelem),
+    Boolean(data.grandChelem),
+  ]]);
+
   SpreadsheetApp.flush();
   var result = readBack_(sheet, row);
   if (todayBaseline !== null) result.todayBaseline = todayBaseline;
@@ -131,9 +145,10 @@ function deleteLast_(sheet) {
 
   var numero = sheet.getRange(row, 1).getValue();
   var preneur = sheet.getRange(row, 2).getValue();
-  // Efface uniquement les cellules de saisie : B..K et Q..V
+  // Efface uniquement les cellules de saisie : B..K, Q..V et AA..AB
   sheet.getRange(row, 2, 1, 10).clearContent();
   sheet.getRange(row, 17, 1, 6).clearContent();
+  sheet.getRange(row, 27, 1, 2).clearContent();
   SpreadsheetApp.flush();
   return { ok: true, deleted: { row: row, numero: numero, preneur: preneur } };
 }
